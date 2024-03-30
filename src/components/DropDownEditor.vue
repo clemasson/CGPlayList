@@ -15,7 +15,9 @@
   
   export default {
     components: {  },
-    props: ["obj", "definition"],
+    props: ["obj", "definition","value"],
+    emits: ["change"],
+
     data() {
       return {
   

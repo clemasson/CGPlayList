@@ -22,8 +22,10 @@ app.use(vuetify);
 app.use(router);
 
 import ObjectEditor from '@/components/ObjectEditor.vue'
+import ObjectContentEditor from '@/components/ObjectContentEditor.vue'
 
 app.component('ObjectEditor', ObjectEditor)
+app.component('ObjectContentEditor', ObjectContentEditor)
 
 app.mount('#app');
 

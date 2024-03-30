@@ -1,29 +1,41 @@
 <template>
-    <div style="display: flex;flex-direction: row;align-items: center;padding-top: 8px;padding-bottom: 8px;text-align: end;">
-      <div style="width: 100px;padding-right: 8px;">
-        <b>{{ definition.name || definition.field }}: </b>
-      </div>
-      <div>
-        <!-- <VTextField
-          v-model="obj[definition.field]"
-          :label="definition.name || definition.field"
-        /> -->
-      </div>
-    </div>
-  </template>
-  
-  
-  <script>
+  <VRow>
+    <VCol>
+      <VSwitch 
+        color="primary"
+        :false-value="falseValue"
+        :true-value="trueValue"
+        v-model="obj[definition.field]" :label="definition.name || definition.field" hide-details
+        inset></VSwitch>
+    </VCol>
+  </VRow>
+</template>
+
+<script>
   //import UITools from '@/components/UITools.vue';
   
   export default {
     components: {  },
-    props: ["obj", "definition"],
+    props: ["obj", "definition","value"],
+    emits: ["change"],
     data() {
       return {
   
       }
     },  
+    computed:
+    {
+      trueValue:function()
+      {
+        if (this.definition.hasOwnProperty('true')) return this.definition.true;
+        return true;
+      },
+      falseValue:function()
+      {
+        if (this.definition.hasOwnProperty('false')) return this.definition.false;
+        return false;
+      }
+    },
     mounted:function()
     {
     },

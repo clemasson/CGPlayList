@@ -1,20 +1,9 @@
 <template>
-  <VExpansionPanels multiple class="mb-2">
-    <VExpansionPanel>
-      <VExpansionPanelTitle>
-        <h2>{{ definition.field }}</h2>
-      </VExpansionPanelTitle>
-      <VExpansionPanelText>
+  <div v-if="value && definition.childs" v-for="(field,idx) in definition.childs" :key="idx">
 
-        <div v-if="value && definition.childs" v-for="(field,idx) in definition.childs" :key="idx">
-
-          <Component :is="field.type+'Editor'" :ref="field.name" :value="value[field.field]" :obj="value"
-            :definition="field" @change="Change" />
-        </div>
-      </VExpansionPanelText>
-    </VExpansionPanel>
-
-  </VExpansionPanels>
+    <Component :is="field.type+'Editor'" :ref="field.name" :value="value[field.field]" :obj="value" :definition="field"
+      @change="Change" />
+  </div>
 </template>
   
   

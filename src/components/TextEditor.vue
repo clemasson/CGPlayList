@@ -1,16 +1,15 @@
 <template>
-    <div
-      style="display: flex;flex-direction: row;align-items: center;padding-top: 8px;padding-bottom: 8px;"
-    >
-      <div style="flex: 1;">
-        
-        <VTextField
-          v-model="obj[definition.field]"
-          :label="definition.name || definition.field"
-        /> 
-      </div>
-    </div>
-  </template>
+  <VRow>
+    <VCol>
+      <VTextField  :model-value="value" @input="ProcessInput($event)" :label="definition.name || definition.field" >
+        <template v-slot:append-inner>
+          <v-btn v-if="value!=null" icon="mdi-delete" variant="text" size="small" @click="SetNull()" >
+          </v-btn>
+        </template>
+      </VTextField>
+    </VCol>
+  </VRow>
+</template>
   
   
   <script>
@@ -18,7 +17,8 @@
   
   export default {
     components: {  },
-    props: ["obj", "definition"],
+    props: ["obj", "definition","value"],
+    emits: ["change"],
     data() {
       return {
   
@@ -29,7 +29,17 @@
     },
     methods:
     {
-        
+      SetNull()
+      {
+        console.log("set content to null");
+        //this.obj[this.definition.name]=null
+        this.$emit("change", this.definition,null)
+      },
+      ProcessInput($event)
+      {
+        console.log("Process Input: ",$event.target.value)
+        this.$emit("change", this.definition,$event.target.value)
+      } 
     },
   }
   </script>

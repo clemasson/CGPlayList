@@ -1,12 +1,11 @@
 <template>
   <span>
-    <VCard class="mx-auto" style="max-width: 1000px;">
+    
+    <VCard class="mx-auto" style="max-width: 1200px;">
       <VCardText>
-        <ObjectEditor ref="objectEditor" :obj="obj" :definition="definition" />
+        <ObjectEditor ref="objectEditor" :value="obj"  :definition="definition" @change="ChangeOccured" />
       </VCardText>
       <VCardText>
-
-
 
         <VRow>
           <VCol>
@@ -19,6 +18,7 @@
             <pre>{{ definition }}</pre>
           </VCol>
         </VRow>
+
       </VCardText>
     </VCard>
   </span>
@@ -30,8 +30,10 @@ export default {
   name: 'TestVue',
   data() {
     return {
-        definition:[
-          { 
+      definition: {
+        field:"root",
+        childs:[
+        { 
             "field":"mode","name":"mode","description":"red / green",
             "type":"dropdown",
             "dataset":["red","green"],
@@ -48,10 +50,40 @@ export default {
             "type":"text",
           },
           {
+                "field":"name1",
+                "type":"object",
+                "childs":[
+                  {
+                    "field":"firstname",
+                    "type":"text"
+                  },
+                  {
+                    "field":"lastname",
+                    "type":"text"
+                  }
+
+                ]
+              },
+              {
+                "field":"name2",
+                "type":"object",
+                "childs":[
+                  {
+                    "field":"firstname",
+                    "type":"text"
+                  },
+                  {
+                    "field":"lastname",
+                    "type":"text"
+                  }
+
+                ]
+              },
+          {
             "field":"items",
             "type":"array",
             "title":"text",
-            "definition":[
+            "childs":[
               {
                 "field":"type",
                 "type":"dropdown",
@@ -64,11 +96,12 @@ export default {
               {
                 "field":"nat",
                 "type":"text",
-              },
+              }
             ],
           },
-        ],
-        obj:{
+        ]
+      },
+      obj:{
           "mode": "red",
           "enearthright": 0,
           "enearthleft": 1,
@@ -76,6 +109,13 @@ export default {
           "endetails": 0,
           "name": "<b>NEXT EVENT</b>",
           "enlocalisationdetails": 0,
+          "name1":{
+            "firstname":"coco"
+          },
+          "name2":
+          {
+
+          },
           "items": [
             {
               "type": "nat",
@@ -88,11 +128,14 @@ export default {
             },
           ],   
         },
-      
 
     };
   },
   methods: {
+    ChangeOccured(definition,value)
+    {
+      console.log("change occured",value)
+    }
   },
 };
 </script>
