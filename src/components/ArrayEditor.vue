@@ -1,65 +1,52 @@
 <template>
+  <v-expansion-panels multiple class="mb-2" v-model="panels">
+    <v-expansion-panel value="main">
+      <v-expansion-panel-title class="pt-0 pb-0">
+        <div style="display: flex;xbackground-color: yellow;width: 100%; align-items: center;">
+          <h3>{{definition.field}}</h3>
+          <div style="flex:1"></div>
+          <VBtn v-if="value" size="small" variant="text" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
+          </VBtn>
+          <VBtn v-if="value" size="small" icon="mdi-plus" variant="text" color="green" @click.stop="AddElement()">
+          </VBtn>
+          <VBtn v-if="!value" size="small" icon="mdi-plus" variant="text" color="blue" @click.stop="Create()">
+          </VBtn>
+        </div>
 
-  <VRow>
-    <VCol>
-      <v-expansion-panels multiple class="mb-2">
-        <v-expansion-panel>
-          <v-expansion-panel-title>
-            <h2>{{definition.field}}</h2>
-          </v-expansion-panel-title>
-          <v-expansion-panel-text>
-            <VExpansionPanels multiple v-if="value">
-              <draggable v-model="obj[definition.field]" style="width: 100%;" item-key="index">
-                <template #item="{ element, index }">
-                  <VExpansionPanel>
-                    <VExpansionPanelTitle><b>{{ element[definition.title] }}</b></VExpansionPanelTitle>
-                    <VExpansionPanelText>
-                      <ObjectContentEditor :value="element" :definition="definition"></ObjectContentEditor>
-                      <div
-                        style="display:flex;width:100%;xbackground-color: lime; flex-direction: column; align-items: flex-end;  justify-content: flex-end;">
-                        <VBtn class="mt-2" color="red" @click="RemoveElementByIndex(index)">
-                          Remove
-                          <v-icon icon="mdi-delete" end></v-icon>
-                        </VBtn>
-                      </div>
-                    </VExpansionPanelText>
-                  </VExpansionPanel>
-                </template>
-              </draggable>
-            </VExpansionPanels>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <VExpansionPanels multiple v-if="value">
+          <draggable v-model="obj[definition.field]" style="width: 100%;" item-key="index">
+            <template #item="{ element, index }">
+              <VExpansionPanel>
+                <VExpansionPanelTitle class="pt-0 pb-0">
+                  <b>{{ element[definition.title] }}</b>
+                  <VSpacer></VSpacer>
+                  <VBtn size="small" icon="mdi-delete" variant="text" color="red"
+                    @click.stop="RemoveElementByIndex(index)">
+                  </VBtn>
 
-            <div v-if="value"
-              style="display:flex;width:100%;xbackground-color: lime; flex-direction: row; align-items: flex-end;  justify-content: flex-end;">
-              <VBtn class="mt-2 mr-2" color="red" @click="RemoveElement()">
-                Remove
-                <v-icon icon="mdi-delete" end></v-icon>
-              </VBtn>
-              <VBtn class="mt-4" color="green" @click="AddElement()">
-                Add
-                <v-icon icon="mdi-plus" end></v-icon>
-              </VBtn>
-            </div>
+                </VExpansionPanelTitle>
+                <VExpansionPanelText>
+                  <ObjectContentEditor :value="element" :definition="definition"></ObjectContentEditor>
+                </VExpansionPanelText>
+              </VExpansionPanel>
+            </template>
+          </draggable>
+        </VExpansionPanels>
 
-            <div v-else>
-              NULL
-
-              <div 
-                style="display:flex;width:100%;xbackground-color: lime; flex-direction: row; align-items: flex-end;  justify-content: flex-end;">
-                <VBtn class="mt-2" color="blue" @click="Create()">
-                  Create
-                  <v-icon icon="mdi-plus" end></v-icon>
-                </VBtn>
-              </div>
-
-            </div>
-
-          </v-expansion-panel-text>
+        <div v-if="value && value.length==0">EMPTY</div>
+        <div v-if="!value">
+          NULL
 
 
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </VCol>
-  </VRow>
+        </div>
+
+      </v-expansion-panel-text>
+
+
+    </v-expansion-panel>
+  </v-expansion-panels>
 
 </template>
   
@@ -78,7 +65,8 @@ export default {
   props: ["obj", "definition","value"],
   data() {
     return {
-      localDefinition:{}
+      localDefinition:{},
+      panels:[]
     }
   },  
   emits: ["change"],
@@ -98,17 +86,21 @@ export default {
       {
         this.$emit("change",this.definition,null)
         //this.obj[this.definition.field]=null;
+
+        this.panels=[]
       },
 
       Create()
       {
         //this.obj[this.definition.field]=[];
         this.$emit("change",this.definition,[])
+        this.panels=["main"]
       },
 
       AddElement()
       {
         this.obj[this.definition.field].push({});
+        this.panels=["main"]
       }
   },
   created:function()

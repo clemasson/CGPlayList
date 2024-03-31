@@ -1,14 +1,7 @@
 <template>
-  <VRow>
-    <VCol>
-      <VSwitch 
-        color="primary"
-        :false-value="falseValue"
-        :true-value="trueValue"
-        v-model="obj[definition.field]" :label="definition.name || definition.field" hide-details
-        inset></VSwitch>
-    </VCol>
-  </VRow>
+
+  <VSwitch color="primary" density="compact" :false-value="falseValue" :true-value="trueValue" v-model="obj[definition.field]"
+    :label="definition.name || definition.field" hide-details inset></VSwitch>
 </template>
 
 <script>

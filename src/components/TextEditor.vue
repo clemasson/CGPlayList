@@ -1,18 +1,14 @@
 <template>
-  <VRow>
-    <VCol>
-      <VTextField dense :model-value="value" @input="ProcessInput($event)" :label="definition.name || definition.field" >
-        <template v-slot:append-inner>
-          <v-btn v-if="value!=null" icon="mdi-delete" variant="text" size="small" @click="SetNull()" >
-          </v-btn>
-        </template>
-      </VTextField>
-    </VCol>
-  </VRow>
+  <VTextField density="compact" :model-value="value" variant="solo" @input="ProcessInput($event)"
+    :label="definition.name || definition.field">
+    <template v-slot:append-inner>
+      <v-btn v-if="value!=null" icon="mdi-close" color="red" variant="text" size="small" @click="SetNull()">
+      </v-btn>
+    </template>
+  </VTextField>
 </template>
-  
-  
-  <script>
+    
+<script>
 //  import UITools from '@/components/UITools.vue';
   
   export default {
@@ -37,7 +33,7 @@
       },
       ProcessInput($event)
       {
-        console.log("Process Input: ",$event.target.value)
+        //console.log("Process Input: ",$event.target.value)
         this.$emit("change", this.definition,$event.target.value)
       } 
     },

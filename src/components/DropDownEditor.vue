@@ -1,14 +1,8 @@
 <template>
-    <VRow>
-      <VCol>
-      <VSelect
-        v-model="obj[definition.field]"
-        :items="definition.dataset"
-        :label="definition.name || definition.field"
-      /> 
-    </VCol>
-    </VRow>
-  </template>
+  <VSelect variant="solo" density="compact" v-model="obj[definition.field]" :items="definition.dataset"
+    :label="definition.name || definition.field" :hint="definition.help"/>
+
+</template>
   
   <script>
   //import UITools from '@/components/UITools.vue';

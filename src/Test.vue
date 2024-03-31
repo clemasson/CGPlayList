@@ -1,6 +1,12 @@
 <template>
   <span>
+    <ObjectEditorDialog ref="objEditor"></ObjectEditorDialog>
     
+    <h1>inline</h1>
+    <VBtn @click="OpenObjectEditor()">Edit dialog</VBtn>
+
+    <VBtn @click="GetTemplate()">GetTemplate</VBtn>
+
     <VCard class="mx-auto" style="max-width: 480px;">
       <VCardText>
         <ObjectEditor ref="objectEditor" :value="obj"  :definition="definition" @change="ChangeOccured" />
@@ -9,14 +15,18 @@
 
         <VRow>
           <VCol>
+            <h1>Template</h1>
+            <pre>{{ template }}</pre>
+          </VCol>
+          <VCol>
             <h1>Object</h1>
             <pre>{{ obj }}</pre>
           </VCol>
-          <VCol>
+          <!-- <VCol>
             <h1>Definition</h1>
-
             <pre>{{ definition }}</pre>
-          </VCol>
+          </VCol> -->
+
         </VRow>
 
       </VCardText>
@@ -24,17 +34,21 @@
   </span>
 </template>
 <script>
-
+import { registerRuntimeCompiler } from 'vue';
+import { VBtn } from 'vuetify/lib/components/index.mjs';
+import templateService from  '@/services/templateService' 
 
 export default {
   name: 'TestVue',
   data() {
     return {
+      template:{},
       definition: {
         field:"root",
         childs:[
         { 
             "field":"mode","name":"mode","description":"red / green",
+            "help":"prout",
             "type":"dropdown",
             "dataset":["red","green"],
           },
@@ -135,7 +149,34 @@ export default {
     ChangeOccured(definition,value)
     {
       console.log("change occured",value)
+      this.obj=value
+    },
+
+    OpenObjectEditor()
+    {
+      var objEditor=this.$refs["objEditor"];
+      console.log("ok? ",objEditor)
+      objEditor.Edit(this.obj,this.definition,"Hello").then(reply=>{
+        console.log("object editor reply: ",reply);
+        if (reply.key=='OK') this.obj=reply.data
+      });
+    },
+
+    GetTemplate()
+    {
+      templateService.get("WBD").then(template=>
+      {
+        this.template=template
+        console.log("resolution of template: ",this.template)
+      });
+
     }
   },
+  mounted:function()
+  {
+    console.log("mounted.");
+    
+    
+  }
 };
 </script>

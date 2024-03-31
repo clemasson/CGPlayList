@@ -1,10 +1,14 @@
 <template>
-  <VExpansionPanels multiple class="mb-2">
-    <VExpansionPanel>
-      <VExpansionPanelTitle>
-        <h2>{{ definition.field }}</h2>
+  <VExpansionPanels v-model="panels" multiple class="mb-2 ">
+    <VExpansionPanel value="main" >
+      <VExpansionPanelTitle class="pt-0 pb-0">
+        <h3>{{ definition.field }}</h3>
+        <VSpacer></VSpacer>
+        <VBtn variant="text" v-if="value" size="small" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
+        </VBtn>
+        <VBtn variant="text" v-if="!value" icon="mdi-plus" size="small" color="blue" @click.stop="Create()"></VBtn>
       </VExpansionPanelTitle>
-      <VExpansionPanelText>
+      <VExpansionPanelText >
 
         <div v-if="value && definition.childs" v-for="(field,idx) in definition.childs" :key="idx">
           <Component :is="field.type+'Editor'" :ref="field.name" :value="value[field.field]" :obj="value"
@@ -13,18 +17,11 @@
 
         <div v-if="value"
           style="display:flex;width:100%;xbackground-color: lime; flex-direction: row; align-items: flex-end;  justify-content: flex-end;">
-          <VBtn variant="text" icon="mdi-delete" class="mt-2 mr-2" color="red" @click="RemoveElement()">
-          </VBtn>
         </div>
 
         <div v-else>
           NULL
 
-          <div
-            style="display:flex;width:100%;xbackground-color: lime; flex-direction: row; align-items: flex-end;  justify-content: flex-end;">
-            <VBtn variant="text" class="mt-2" icon="mdi-plus" color="blue" @click="Create()">
-            </VBtn>
-          </div>
 
         </div>
 
@@ -46,12 +43,13 @@
   
   export default {
     components: { TextEditor,DropDownEditor,DropdownEditor:DropDownEditor,BooleanEditor,ArrayEditor },
-    props: ["obj", "definition","value"],
+    props: ["obj", "definition","value","expand"],
     emits: ["change"],
 
     data() {
       return {
-        localDefinition:[]
+        localDefinition:[],
+        panels:[]
       }
     },  
     mounted:function()
@@ -68,20 +66,27 @@
       }    ,      
       RemoveElement()
       {
+        console.log("remove element")
         this.$emit("change",this.definition,null)
+        this.panels=[]
         //this.obj[this.definition.field]=null;
       },
 
       Create()
       {
         //this.obj[this.definition.field]=[];
-        this.$emit("change",this.definition,[])
+        this.$emit("change",this.definition,{})
+        this.panels=["main"]
       },
 
     },
+    mounted:function()
+    {
+      if (this.expand) this.panels=["main"]
+    },
     created:function()
     {
-      console.log("object def",this.obj);
+      //console.log("object def",this.obj);
             
     }
   }
