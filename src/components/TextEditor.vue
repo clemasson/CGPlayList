@@ -1,7 +1,7 @@
 <template>
   <VRow>
     <VCol>
-      <VTextField  :model-value="value" @input="ProcessInput($event)" :label="definition.name || definition.field" >
+      <VTextField dense :model-value="value" @input="ProcessInput($event)" :label="definition.name || definition.field" >
         <template v-slot:append-inner>
           <v-btn v-if="value!=null" icon="mdi-delete" variant="text" size="small" @click="SetNull()" >
           </v-btn>

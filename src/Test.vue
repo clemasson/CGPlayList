@@ -1,7 +1,7 @@
 <template>
   <span>
     
-    <VCard class="mx-auto" style="max-width: 1200px;">
+    <VCard class="mx-auto" style="max-width: 480px;">
       <VCardText>
         <ObjectEditor ref="objectEditor" :value="obj"  :definition="definition" @change="ChangeOccured" />
       </VCardText>

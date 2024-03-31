@@ -8,7 +8,7 @@
             <h2>{{definition.field}}</h2>
           </v-expansion-panel-title>
           <v-expansion-panel-text>
-            <VExpansionPanels multiple v-if="this.obj[this.definition.field]">
+            <VExpansionPanels multiple v-if="value">
               <draggable v-model="obj[definition.field]" style="width: 100%;" item-key="index">
                 <template #item="{ element, index }">
                   <VExpansionPanel>
@@ -22,16 +22,13 @@
                           <v-icon icon="mdi-delete" end></v-icon>
                         </VBtn>
                       </div>
-
                     </VExpansionPanelText>
-
-
                   </VExpansionPanel>
                 </template>
               </draggable>
             </VExpansionPanels>
 
-            <div v-if="this.obj[this.definition.field]"
+            <div v-if="value"
               style="display:flex;width:100%;xbackground-color: lime; flex-direction: row; align-items: flex-end;  justify-content: flex-end;">
               <VBtn class="mt-2 mr-2" color="red" @click="RemoveElement()">
                 Remove

@@ -33,7 +33,7 @@
     {
       Change:function(definition,value)
       {
-        console.log("change event called on objecteditor: ",definition,value)
+        //console.log("change event called on objecteditor: ",definition,value)
         this.value[definition.field]=value;
       }        
     },
