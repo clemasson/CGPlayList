@@ -9,7 +9,7 @@
       >
         <VCard>
           <VCardTitle class="headline">
-            <span>{{ $t(title) }}</span>
+            <span>{{ title }}</span>
           </VCardTitle>
   
           <VCardText v-if="translate">
@@ -60,17 +60,14 @@
         v-model="showDialog"
         name="dlgSelectDialog"
         persistent
-        max-width="400"
+        max-width="600"
       >
         <VCard>
           <VCardTitle class="headline">
-            <span>{{ $t(title) }}</span>
+            <span>{{ title }}</span>
           </VCardTitle>
   
-          <VCardText v-if="translate">
-            {{ $t(message) }}
-          </VCardText>
-          <VCardText v-if="!translate">
+          <VCardText >
             {{ message }}
           </VCardText>
   
@@ -90,7 +87,6 @@
                 :item="item"
               >
                 <VListItem
-                  active-color="primary"
                   :value="item"
                   @click="selectItem(item)"
                 >

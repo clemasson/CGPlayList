@@ -7,6 +7,8 @@
 
     <VBtn @click="GetTemplate()">GetTemplate</VBtn>
 
+    <VBtn @click="EditPlayList('wbd','test')">Edit playlist</VBtn>
+
     <VCard class="mx-auto" style="max-width: 480px;">
       <VCardText>
         <ObjectEditor ref="objectEditor" :value="obj"  :definition="definition" @change="ChangeOccured" />
@@ -160,6 +162,13 @@ export default {
         console.log("object editor reply: ",reply);
         if (reply.key=='OK') this.obj=reply.data
       });
+    },
+
+    EditPlayList(layout,playlist)
+    {
+      //playlisteditor
+      console.log("Edit playlist")
+      this.$router.push({ name: 'playlisteditor', params: { layout:layout,playlist:playlist } })
     },
 
     GetTemplate()

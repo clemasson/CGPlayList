@@ -41,11 +41,13 @@ import UITools from '@/components/UITools.vue'
 import ObjectEditor from '@/components/ObjectEditor.vue'
 import ObjectEditorDialog from '@/components/ObjectEditorDialog.vue'
 import ObjectContentEditor from '@/components/ObjectContentEditor.vue'
+import PlaylistItem from '@/components/PlaylistItem.vue'
 
 app.component('UITools', UITools)
 app.component('ObjectEditor', ObjectEditor)
 app.component('ObjectEditorDialog', ObjectEditorDialog)
 app.component('ObjectContentEditor', ObjectContentEditor)
+app.component('PlaylistItem', PlaylistItem)
 
 app.mount('#app');
 

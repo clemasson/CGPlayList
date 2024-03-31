@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import(/* webpackChunkName: "test" */ '../Test.vue'),
     },
     {
+      name: 'playlisteditor',
+      path: '/playlist/:layout/playlist/:playlist/edit',
+      component: () => import(/* webpackChunkName: "editor" */ '../PlayListEditor.vue'),
+    },
+    {
       path: '',
       redirect: '/test',
     },

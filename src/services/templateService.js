@@ -1,40 +1,15 @@
 var templateDefinition = {
     "layout": "WBD",
     "resolution": [1920, 1080],
-    "compactscenes":
-        "background,C2.60|bg",
 
     "scenes":
         [
             "watermark,wat,,C2.1 - Watermark",
             "background,bg,,C2.60 - Still",
             "backgroundvideo,bg,,C2.61 - Video",
-            "name,,,C2.2/2.3... lower third|showspeed|hidespeed",
-            {
-                "template": "name",
-                "title": "C2.2/C.3... Lower third",
-                "layer": "default",
-                "actions": [
-                    {
-                        "action": "showspeed",
-                        "title": "Show speed",
-                        "definition": ["speed|text"]
-                    },
-                    {
-                        "action": "hidespeed",
-                        "title": "Hide speed"
-                    }
-
-                ],
-                "definition": ["*mode", "align|dropdown,left,right"]
-            },
-            {
-                "template": "dualname",
-                "title": "Dual name",
-                "layer": "default",
-                "definition": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"]
-            }
-
+            "name,,,C2.1 lower third 1 line|showspeed|hidespeed",
+            "name,,,C2.2 lower2 lines|showspeed|hidespeed",
+            "dualname,default,,2 Names"
         ],
     "definitions":
     {
@@ -42,8 +17,17 @@ var templateDefinition = {
         "background": ["image,Image,Background image|text"],
         "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"],
         "name": ["name|text", "team|text", "nat|text"],
+        "name.showspeed": ["speed|text"],
+        "dualname": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"],
         "mode": ["mode|dropdown,red,green"]
     }
+}
+
+var playList={
+    "layout":"wbd",
+    "title":"A test playlist",
+    "type":"folder",
+    "scenes":[]
 }
 
 const templateService = new (class {
@@ -113,7 +97,6 @@ const templateService = new (class {
                         toAdd.childs = [];
 
                         if (typeTokens.length > 0) {
-                            console.log("AH COOL CONVERT ", toAdd.childs, typeTokens)
                             toAdd.childs = this.convertDefinition(template, typeTokens[0]);
                         }
                         break;
@@ -149,50 +132,61 @@ const templateService = new (class {
         return toRet;
     }
 
-    processAction(template, action) 
-    {
+    convertAction(template, scene, action) {
 
-        if (this.isString(action))
-        {
-            var tokens=action.split(',');
-            
-            //actions: name,[definition],[title]  // default definition: template.action
+        if (this.isString(action)) {
+            //actions: action,[definition],[title]  // default definition: template.action
+            var tokens = action.split(',');
+
+            var action = tokens[0];
+            var definition = tokens.length > 1 ? tokens[1] : "";
+            if (definition == '') definition = scene.template + '.' + action;
+
+            var title = tokens.length > 2 ? tokens[2] : '';
+
+            action = { "action": action, "title": title, "definition": definition }
         }
-        
-        return action;            
+
+        action.definition = this.convertDefinition(template, action.definition);
+
+        return action;
     }
 
     processScene(template, scene) {
         var toRet = scene;
 
         if (this.isString(scene)) {
-            // template,[layer],[definition],[title]|actions
+            // template[:key],[layer],[definition],[title]|actions
             // actions: name,[definition],[title]  // default definition: template.action
             var tokens = scene.split('|');
             var sceneTokens = tokens[0].split(',');
-            var templateName = sceneTokens[0];
+            var templateNameTokens = sceneTokens[0].split(':');
+            var templateName=templateNameTokens[0];
+            var key=templateNameTokens.length>1?templateNameTokens[1]:templateName;
             var layer = sceneTokens.length > 1 ? sceneTokens[1] : 'default';
-            var definition = sceneTokens.length > 2 ? sceneTokens[2] : templateName;
+            if (layer=='') layer='default';
+            var definition = sceneTokens.length > 2 ? sceneTokens[2] : key;
             if (definition == "") definition = templateName;
             var title = sceneTokens.length > 3 ? sceneTokens[3] : null;
-            toRet = { "template": templateName, "layer": layer, "definition": definition, "title": title }
+            toRet = { "key":key, "template": templateName, "layer": layer, "definition": definition, "title": title }
 
             tokens.splice(0, 1);
             if (tokens.length > 0) {
-                console.log("ACTION ACTIONS ACTIONS ",tokens)
+                console.log("ACTION ACTIONS ACTIONS ", tokens)
                 toRet.actions = tokens;
             }
         }
 
-        console.log("convert scene", toRet);
+        //console.log("convert scene", toRet);
         toRet.definition = this.convertDefinition(template, toRet.definition);
 
         if (!toRet.actions) toRet.actions = [];
 
         var actions = toRet.actions;
         toRet.actions = [];
+
         actions.forEach(action => {
-            var toAdd = this.processAction(template, action);
+            var toAdd = this.convertAction(template, toRet, action);
             if (toAdd) toRet.actions.push(toAdd);
         });
 
@@ -212,7 +206,18 @@ const templateService = new (class {
 
         toRet.converted = true;
 
+        toRet.sortedScenes={};
+
+        scenes.forEach(scene=>{
+
+        })
+
         return toRet;
+    }
+
+    getPlayList(layout,name)
+    {
+        return Promise.resolve(playList);
     }
 
     get(layout) {
