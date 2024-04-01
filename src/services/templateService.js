@@ -1,3 +1,6 @@
+import axios from 'axios'
+import appSettingsService from './appSettingsService'
+
 var templateDefinition = {
     "layout": "WBD",
     "resolution": [1920, 1080],
@@ -33,6 +36,11 @@ var playList={
 }
 
 const templateService = new (class {
+
+    setApiUrl(urlBase)
+    {
+        
+    }
 
     isString(variable) {
         return typeof variable === "string";
@@ -182,7 +190,7 @@ const templateService = new (class {
 
             tokens.splice(0, 1);
             if (tokens.length > 0) {
-                console.log("ACTION ACTIONS ACTIONS ", tokens)
+                //console.log("ACTION ACTIONS ACTIONS ", tokens)
                 toRet.actions = tokens;
             }
         }
@@ -233,9 +241,66 @@ const templateService = new (class {
         return toRet;
     }
 
+    setUrlBase(url)
+    {
+        if (url==null)
+        {
+            this.apiUrlBase=null;
+            return;
+        }
+
+        switch (url)
+        {
+            case "local":
+                url="/api/graphics/casper/";
+                break;
+
+            case "dev":
+                url="http://localhost:9011/api/graphics/casper/";
+                break;
+
+            case "worker":
+                url="http://crworker.cloudapp.net:9011/api/graphics/casper/";
+                break;
+                
+        }
+
+        this.apiUrlBase=url;
+    }
+
+    getUrlBase()
+    {
+        if (this.apiUrlBase) return this.apiUrlBase;
+        return appSettingsService.get("apiUrlBase")+'graphics/casper/';
+    }
+
     getPlayList(layout,name)
     {
-        return Promise.resolve(playList);
+        var url=this.getUrlBase()+"playlist/"+layout+"/"+name;
+
+        console.log("templateApiUrlBase=",url)        
+
+        return new Promise((resolve, reject) => {
+            console.log("url= "+url);
+            axios
+              .get(url)
+              .then((httpReply) => {
+    
+                console.log("GetPlayList reply = ",httpReply.data)
+                
+                resolve(httpReply.data)
+              })
+              .catch((error) => {
+                if (error.response) {
+                  reject({ errorMessage: 'HTTP_' + error.response.status })
+                } else {
+                  reject(error)
+                }
+              })
+            });
+      
+
+        
     }
 
     deletePlayListItemByIdInternal(playlist,item,id)
@@ -254,7 +319,6 @@ const templateService = new (class {
         }
         return false
     }
-
     
     deletePlayListItemById(playlist,id)
     {
@@ -269,10 +333,13 @@ const templateService = new (class {
     get(layout) {
         var toRet = this.processTemplateDefinition(templateDefinition);
 
+        console.log("URL base ",this.apiUrlBase)
+
         return Promise.resolve(toRet);
     }
 
     constructor() {
+        //this.apiUrlBase=appSettingsService.get("apiUrlBase");        
     }
 })()
 
