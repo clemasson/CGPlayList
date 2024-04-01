@@ -27,6 +27,8 @@ var playList={
     "layout":"wbd",
     "title":"A test playlist",
     "type":"folder",
+    "id":1,
+    "maxid":1,
     "scenes":[]
 }
 
@@ -117,7 +119,7 @@ const templateService = new (class {
         if (toConvert == null) return toRet;
 
         if (Array.isArray(toConvert)) {
-            console.log("array conversion: ", toConvert)
+            //console.log("array conversion: ", toConvert)
 
             toConvert.forEach(field => {
 
@@ -125,7 +127,7 @@ const templateService = new (class {
             })
         }
         else {
-            console.log("direct reference: ", template, toConvert)
+            //console.log("direct reference: ", template, toConvert)
             return this.convertDefinition(template, template.definitions[toConvert]);
         }
 
@@ -135,19 +137,27 @@ const templateService = new (class {
     convertAction(template, scene, action) {
 
         if (this.isString(action)) {
-            //actions: action,[definition],[title]  // default definition: template.action
+            //actions: action[:key],[definition],[title]  // default definition: template.action
             var tokens = action.split(',');
 
-            var action = tokens[0];
-            var definition = tokens.length > 1 ? tokens[1] : "";
+            var actionTokens = tokens[0].split(':');
+            var action=actionTokens[0];
+            var actionKey=actionTokens.length>1?actionTokens[1]:action;
+            if (actionKey=='') actionKey=action;
+            actionKey=scene.key+'.'+actionKey
+
+            var definition = (tokens.length > 1 ? tokens[1] : "");
             if (definition == '') definition = scene.template + '.' + action;
 
             var title = tokens.length > 2 ? tokens[2] : '';
+            if (title=='') title=action;
 
-            action = { "action": action, "title": title, "definition": definition }
+            action = { "key":actionKey, "action": action, "title": title, "definition": definition }
         }
 
         action.definition = this.convertDefinition(template, action.definition);
+
+
 
         return action;
     }
@@ -206,11 +216,19 @@ const templateService = new (class {
 
         toRet.converted = true;
 
-        toRet.sortedScenes={};
+        toRet.sortedscenes={};
 
-        scenes.forEach(scene=>{
-
+        toRet.scenes.forEach(scene=>{
+            toRet.sortedscenes[scene.key]=scene;
+            if (scene.actions)
+            {
+                scene.actions.forEach(action=>{
+                    toRet.sortedscenes[action.key]=action;
+                })
+            }
         })
+
+        delete toRet["definitions"]
 
         return toRet;
     }
@@ -218,6 +236,34 @@ const templateService = new (class {
     getPlayList(layout,name)
     {
         return Promise.resolve(playList);
+    }
+
+    deletePlayListItemByIdInternal(playlist,item,id)
+    {
+        if (item.scenes==null) return false;
+        var i=0;
+        while (i<item.scenes.length)
+        {
+            if (item.scenes[i].id==id)
+            {
+                item.scenes.splice(i,1);
+                return true;
+            }
+            if (this.deletePlayListItemByIdInternal(playlist,item.scenes[i],id)) return true;
+            i++;
+        }
+        return false
+    }
+
+    
+    deletePlayListItemById(playlist,id)
+    {
+        if (this.deletePlayListItemByIdInternal(playlist,playlist,id))
+        {
+            playlist.dirty=true
+        }
+
+        return playlist
     }
 
     get(layout) {

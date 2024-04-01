@@ -10,11 +10,13 @@
       </VCardText>
 
       <VForm ref="form" v-model="valid" lazy-validation @submit.prevent="checkForm">
-
-        <ObjectEditor :expand="true" :value="obj" @change="ChangeOccured" :definition="definition" ref="objEditor" />
+        <VCardText>
+          <VTextField variant="solo" density="compact" label="title" v-model="item.title"></VTextField>
+        </VCardText>        
+        <ObjectEditor v-if="item && definition" :expand="true" :value="item.data" @change="ChangeOccured" :definition="definition"
+          ref="objEditor" />
 
       </VForm>
-
 
       <VCardActions>
         <VSpacer />
@@ -32,7 +34,6 @@
   
 <script>
 
-import { toHandlers } from "vue"
 import ObjectEditor  from "./ObjectEditor.vue"
 
   export default {
@@ -45,7 +46,8 @@ import ObjectEditor  from "./ObjectEditor.vue"
       title:null,
       actions:[],
       valid:false,
-      obj:null,
+      item:null,
+      scene:null,
       definition:null
     }
   },  
@@ -77,30 +79,30 @@ import ObjectEditor  from "./ObjectEditor.vue"
       {
         this.dialog=false
 
-        this.promiseResolve({ action: action } )
+        this.promiseResolve( { key: action,item: this.item, scene: this.scene } )
+
       } 
       else if (action.action)
       {
         this.errorMessage=null
 
-        //console.log('action defined')
+        console.log('action defined')
         var reply=action.action()
-       // console.log('reply=',reply)
 
         Promise.resolve(reply).then(success=>
         {
-          this.promiseResolve( { key: action.key,data: this.obj,definition:this.definition } )
+          this.promiseResolve( { key: action.key,item: this.item, scene: this.scene } )
 
           this.showDialog=false
         },error=>{
-          //console.log('action returns error ',error)
+          console.log('action returns error ',error)
           this.errorMessage=error==null?"???":error
         })
 
       } 
       else 
       {
-       // console.log("we'll close dialog")
+        //console.log("we'll close dialog")
         this.showDialog=false
         
 
@@ -132,10 +134,10 @@ import ObjectEditor  from "./ObjectEditor.vue"
     ChangeOccured(definition,value)
     {
       console.log("change occured in dialog",value)
-      this.obj=value
+      this.item.data=value
     },
     
-    Edit(obj,definition,title)
+    Edit(item,layout,title)
     {
       //console.log("Edit Called");
 
@@ -170,11 +172,22 @@ import ObjectEditor  from "./ObjectEditor.vue"
       } },{ key: 'CANCEL' }]);
     
 
-      this.obj=JSON.parse(JSON.stringify(obj));
-      this.title=title;
-      this.definition=definition;
+      //console.log("playlistitem",item)
+      this.item=JSON.parse(JSON.stringify(item));
+      this.title="Edit";
+      
+      this.scene=layout.sortedscenes[item.layoutkey];
+
+      if (this.scene && this.scene.definition.length>0)
+      {
+      //console.log("item we edit: ",item)
+      this.definition={field:'data',childs:this.scene.definition};
       this.showDialog=true
       this.errorMessage=null
+      } else
+      {
+        this.definition=null;
+      }
 
 
       return new Promise((resolve,reject)=>{

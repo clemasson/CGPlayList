@@ -2,7 +2,7 @@
   <VTextField density="compact" :model-value="value" variant="solo" @input="ProcessInput($event)"
     :label="definition.name || definition.field">
     <template v-slot:append-inner>
-      <v-btn v-if="value!=null" icon="mdi-close" color="red" variant="text" size="small" @click="SetNull()">
+      <v-btn tabindex="-1" v-if="value!=null" icon="mdi-close" color="red" variant="text" size="small" @click="SetNull()">
       </v-btn>
     </template>
   </VTextField>

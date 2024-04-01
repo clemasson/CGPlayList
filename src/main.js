@@ -41,13 +41,19 @@ import UITools from '@/components/UITools.vue'
 import ObjectEditor from '@/components/ObjectEditor.vue'
 import ObjectEditorDialog from '@/components/ObjectEditorDialog.vue'
 import ObjectContentEditor from '@/components/ObjectContentEditor.vue'
-import PlaylistItem from '@/components/PlaylistItem.vue'
+import PlaylistItemRoot from '@/components/PlaylistItemRoot.vue'
+import PlaylistItemFolder from '@/components/PlaylistItemFolder.vue'
+import PlaylistItemScene from '@/components/PlaylistItemScene.vue'
+import PlaylistItemAction from '@/components/PlaylistItemAction.vue'
 
 app.component('UITools', UITools)
 app.component('ObjectEditor', ObjectEditor)
 app.component('ObjectEditorDialog', ObjectEditorDialog)
 app.component('ObjectContentEditor', ObjectContentEditor)
-app.component('PlaylistItem', PlaylistItem)
+app.component('PlaylistItemRoot', PlaylistItemRoot)
+app.component('PlaylistItemFolder', PlaylistItemFolder)
+app.component('PlaylistItemScene', PlaylistItemScene)
+app.component('PlaylistItemAction', PlaylistItemAction)
 
 app.mount('#app');
 

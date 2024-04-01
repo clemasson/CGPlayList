@@ -12,10 +12,7 @@
             <span>{{ title }}</span>
           </VCardTitle>
   
-          <VCardText v-if="translate">
-            {{ $t(message) }}
-          </VCardText>
-          <VCardText v-if="!translate">
+          <VCardText >
             {{ message }}
           </VCardText>
          
@@ -50,7 +47,7 @@
             v-bind="attrs"
             @click="snackbar = false"
           >
-            {{ $t("CLOSE") }}
+            Close
           </VBtn>
         </template>
       </VSnackbar>
@@ -72,7 +69,7 @@
           </VCardText>
   
           <VList
-            :lines="false"
+            lines="true"
             density="compact"
           >
             <div
@@ -119,7 +116,7 @@
       >
         <VCard>
           <VCardTitle class="headline">
-            <span>{{ $t(title) }}</span>
+            <span>{{ title }}</span>
           </VCardTitle>
   
           <VCardText v-if="errorMessage">
@@ -192,7 +189,7 @@
         fieldName:null,
         text:null,
         requiredRules: [
-          v => !!v || this.$t("REQUIRED"),
+          v => !!v || "REQUIRED",
         ],
   
       }

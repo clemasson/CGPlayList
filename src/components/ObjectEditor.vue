@@ -1,10 +1,10 @@
 <template>
-  <VExpansionPanels v-model="panels" multiple class="mb-2 ">
+  <VExpansionPanels v-model="panels" multiple class="mb-2 " v-if="definition">
     <VExpansionPanel value="main" >
       <VExpansionPanelTitle class="pt-0 pb-0">
         <h3>{{ definition.field }}</h3>
         <VSpacer></VSpacer>
-        <VBtn variant="text" v-if="value" size="small" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
+        <VBtn tabindex="-1" variant="text" v-if="value" size="small" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
         </VBtn>
         <VBtn variant="text" v-if="!value" icon="mdi-plus" size="small" color="blue" @click.stop="Create()"></VBtn>
       </VExpansionPanelTitle>
@@ -21,14 +21,13 @@
 
         <div v-else>
           NULL
-
-
         </div>
 
       </VExpansionPanelText>
     </VExpansionPanel>
 
   </VExpansionPanels>
+  
 </template>
   
   
