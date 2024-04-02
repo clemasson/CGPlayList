@@ -4,7 +4,7 @@
             <template #select="{ item }">
                 <VListItem :value="item">
                     <VListItemTitle v-text="item.title" />
-                    <VListItemSubtitle v-text="item.template + ' / ' + item.layer" />
+                    <VListItemSubtitle  v-text="item.template + ' / ' + item.layer" />
                 </VListItem>
             </template>
         </UITools>

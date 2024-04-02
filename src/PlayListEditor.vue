@@ -2,89 +2,102 @@
   <div>
     <div style="display:flex;width:100%">
 
-      <div style="max-width: 400px;min-width: 400px;xbackground-color: aqua;padding-left:8px;padding-right:8px">
+      <div :style="{ 'background-color': dirty ? '#ffdddd' : '' }"
+        style="max-width: 400px;min-width: 400px;padding-left:8px;padding-right:8px;min-height: 100vh;">
 
-        <PlaylistItemRoot v-if="playlist" @command="processCommand" :layout="layout" :item="playlist">
-        </PlaylistItemRoot>
-        <span v-if="playlist">MAX ID: {{ playlist.maxid }}</span>
+        <div v-if="playlist">
+          <PlaylistItemRoot v-if="playlist" @command="processCommand" :layout="layout" :item="playlist">
+          </PlaylistItemRoot>
+
+          <VBtn v-if="dirty" @click="SavePlayList()" color="primary" block>Save</VBtn>
+
+        </div>
 
       </div>
 
       <div ref="previewPaneParent" style="xbackground-color: pink;flex:1">
-        <div v-if="layout" style="background-color: #ddd;">
-          Resolution: <b>{{ layout.resolution[0] }} x {{ layout.resolution[1] }}</b><br />
-          Layout: <b>{{ layout.layout }}</b>
-        </div><br />
+        <div class="mb-2" v-if="layout" style="background-color: #ddd;display:flex;align-items: center;">
+          <div style="padding:8px">
+            Resolution: <b>{{ layout.resolution[0] }} x {{ layout.resolution[1] }}</b><br />
+            Layout: <b>{{ layout.layout }}</b>
+          </div>
+          <div style="padding-left: 50px;">
+            <VBtn class="mr-1" size="small" @click="setViewersRatio(0.5)">50/50</VBtn>
+            <VBtn class="mr-1" size="small" @click="setViewersRatio(0.3)">30/70</VBtn>
+            <VBtn size="small" @click="setViewersRatio(0.7)">70/30</VBtn>
+          </div>
+        </div>
 
         <div ref="previewPane" style="position: fixed;xbackground-color: pink;width:100%">
 
-          Viewer width ({{ previewPaneWidth }}):
-          <VBtn size="small" @click="setViewersRatio(0.5)">50/50</VBtn>
-          <VBtn size="small" @click="setViewersRatio(0.3)">30/70</VBtn>
-
-
-
-
-
-          <br /><br />
-
           <div style="display:flex;width:100%">
             <div :style="{ width: (this.viewersRatio * 100) + '%' }" style="padding:5px;overflow: hidden;">
-              <h3>Preview</h3>
+              <h3>{{preview.name}} ({{ preview.title }}) </h3>
 
               <VBtn size="small" @click="setBackground('viewer1', '#000000')">black</VBtn>
               <VBtn size="small" @click="setBackground('viewer1', '#ffffff')">white</VBtn>
               <VBtn size="small" @click="setBackground('viewer1', '#ff0000')">red</VBtn>
               <VBtn size="small" @click="setBackground('viewer1', '#aaaaaa')">grey</VBtn>
 
-              <button class="warning" @click="cls()">clear</button>
-              <br />
+              <VBtn size="small" color="red" @click="SendCommand(preview,'cls')">Clear</VBtn>
 
-              <div class="viewer" ref="viewer1">
-                <iframe class="scaled-frame" scrolling:="no" :src="'https://www.chronorace.be'"></iframe>
+              <div style="position:relative;padding:5px;margin-top: 8px;overflow: hidden;"  >
+                <div class="viewer" :class="{'viewer-active':preview.active}" ref="viewer1" style="position:relative">
+                  <div @click.stop="SetActiveChannel(preview)" style="z-index: 10; position:absolute;width:100%;height:100%"></div>
+                  <iframe ref="preview" class="scaled-frame" scrolling:="no" :src="GetTemplateUrl(preview)"></iframe>
+                </div>
               </div>
 
-              <span>{{ GetTemplateServerUrlBase() }}</span>
+              <a class="app-link text-primary" :href="GetTemplateUrl(preview)" target="_blank">{{
+                GetTemplateUrl(preview) }}</a>
+
+              <VTable density="compact" hover>
+                <thead>
+                  <tr>
+                    <td>Layer</td>
+                    <td>Scene</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item,key) in preview.state" :key="key">
+                    <td>{{ key }}</td>
+                    <td>{{ item.template }}</td>
+                  </tr>
+                </tbody>
+              </VTable>
+
+              <pre>{{ preview }}</pre>
 
             </div>
             <div :style="{ width: ((1 - this.viewersRatio) * 100) + '%' }" style="padding:5px;overflow: hidden">
 
-              <h3>Main</h3>
+              <h3>{{main.name}} ({{ main.title }})</h3>
 
               <VBtn size="small" @click="setBackground('viewer2', '#000000')">black</VBtn>
               <VBtn size="small" @click="setBackground('viewer2', '#ffffff')">white</VBtn>
               <VBtn size="small" @click="setBackground('viewer2', '#ff0000')">red</VBtn>
               <VBtn size="small" @click="setBackground('viewer2', '#aaaaaa')">grey</VBtn>
 
-              <button class="warning" @click="cls()">clear</button>
-              <br />
+              <VBtn size="small" color="red" @click="SendCommand(main,'cls')">Clear</VBtn>
 
-              <div class="viewer" ref="viewer2">
-                <iframe style="position:relative;display: relative;" class="scaled-frame" scrolling:="no"
-                :src="'https://www.chronorace.be'"></iframe>
+              <div style="position:relative;padding:5px;margin-top: 8px;overflow: hidden;"  >
+                <div class="viewer" :class="{'viewer-active':main.active}" ref="viewer2"> 
+                  <div @click.stop="SetActiveChannel(main)" style="z-index: 10; position:absolute;width:100%;height:100%"></div>
+                  <iframe ref="main" style="position:relative;display: relative;" class="scaled-frame" scrolling:="no"
+                    :src="GetTemplateUrl(main)"></iframe>
+                </div>
               </div>
 
-              <span>{{ GetTemplateServerUrlBase() }}</span>
+              <a class="app-link text-primary" :href="GetTemplateUrl(preview)" target="_blank">{{ GetTemplateUrl(main)
+                }}</a>
+
+              <pre>{{ main }}</pre>
 
             </div>
           </div>
 
 
-
-          <pre>
-
-          {{ GetQueryParameters() }}
-          {{ playlist }}
-
-          <pre>
-        </pre>
-
-          </pre>
-
         </div>
-
-
-
 
 
 
@@ -105,6 +118,9 @@ import { VBtn } from 'vuetify/lib/components/index.mjs';
 import templateService from '@/services/templateService'
 import appSettingsService from '@/services/appSettingsService'
 
+import { toRaw } from "vue"
+
+
 import { gsap } from "gsap";
 import { getCurrentInstance, toHandlers } from 'vue';
 
@@ -113,9 +129,9 @@ export default {
   data() {
     return {
       template: {},
-      viewersRatio: 0.5,
       layoutName: null,
       layout: null,
+      viewersRatio: 0.5,
       playlistName: null,
       playlist: null,
       loading: false,
@@ -123,46 +139,77 @@ export default {
       currentDefinition: null,
       selectedItem: null,
       previewPaneWidth: 0,
-      templateServer: ''
+      templateServer: '',
+      dirty: false,
+      preview: {},
+      main: {},
+      channels: {},
+      activeChannel:null
     };
   },
   methods: {
+    GetTemplateUrl(cnl) {
+      if (!this.layout) return "";
+      var toRet = templateService.buildUrl(this.templateServer, this.layout, cnl);
+      console.log("templateServer=", this.templateServer, toRet)
 
-    GetTemplateServerUrlBase() {
-      var toRet = '';
-
-      if (this.templateServer == null) {
-        return "";
-      }
-
-      switch (this.templateServer) {
-        case "online":
-          toRet = "https://chronorace.blob.core.windows.net/webresources/cgtemplates/index.html#/";
-          break;
-
-        case "local":
-          toRet = "https://localhost:8080/webresources/cgtemplates/index.html#/";
-          break;
-
-        default:
-          if (this.templateServer.startsWith('http')) {
-            toRet = this.templateServer;
-          }
-          else toRet = "https://" + this.templateServer + '/webresources/cgtemplates/index.html#/';
-          break;
-      }
-
-      console.log("toRet=", toRet)
-
-
-      return toRet;
-
+      return toRet
     },
 
+    SetActiveChannel(channel)
+    {
+      console.log("SET ACTIVE CHANNEL ",channel)
+      this.activeChannel=channel
+      Object.keys(this.channels).forEach(k=>
+      {
+        this.channels[k].active=false
+      })
+      if (channel!=null) channel.active=true;
+    },
+
+    SavePlayList() {
+      console.log("save playlist ");
+
+      templateService.savePlayList(this.layoutName, this.playlistName, this.playlist).then(ok => {
+        this.origPlayList = JSON.stringify(this.playlist)
+        this.checkDirty();
+        console.log("success");
+      }, error => {
+        console.log("SHIT", error)
+      })
+
+      //templateService.getPlayList(this.layoutName, this.playlistName).then(
+    },
 
     GetRouteUrl() {
       var route = this.$router.resolve({ name: 'cgtest' });
       return route.href
+    },
+
+    isObject(object) {
+      return object != null && typeof object === "object";
+    },
+
+    isDeepEqual(object1, object2) {
+
+      const objKeys1 = Object.keys(object1);
+      const objKeys2 = Object.keys(object2);
+
+      if (objKeys1.length !== objKeys2.length) return false;
+
+      for (var key of objKeys1) {
+        const value1 = object1[key];
+        const value2 = object2[key];
+
+        const isObjects = this.isObject(value1) && this.isObject(value2);
+
+        if ((this.isObjects && !this.isDeepEqual(value1, value2)) ||
+          (!isObjects && value1 !== value2)
+        ) {
+          return false;
+        }
+      }
+      return true;
     },
 
     //GetRouteUrl() {
@@ -175,6 +222,8 @@ export default {
 
       templateService.getPlayList(this.layoutName, this.playlistName).then(playlist => {
         this.playlist = playlist;
+
+        this.origPlayList = JSON.stringify(playlist);
       })
 
       templateService.get(this.layoutName).then(layout => {
@@ -193,17 +242,81 @@ export default {
       setTimeout(() => {
         this.resizeViewers()
       }, 0);
+    },
 
+    GetCurrentChannel()
+    {
+      return this.activeChannel;
+    },
+
+    SendCommand(channel,command,layer,page,action,data,off)
+    {      
+      console.log("send command ",command,"/",page," on layer ",layer)
+
+      if (action && action=='off') off=true
+
+      if (!layer) layer="default";
+      switch (command)
+      {
+        case "cls":
+          channel.state={}
+          break;
+
+        case "play":
+          if (off)
+          {
+            delete channel.state[layer];
+          }
+          else
+          {
+            channel.state[layer]={ "template":  page,"action": action,"data":data }
+
+          }
+          break;
+      }
+
+      setTimeout(() => {
+        switch (channel.mode)
+        {
+          case "direct":
+            var frame=this.$refs[channel.channel]
+            console.log("frame = ",frame)
+            
+            var toSend = { command: command, page: page, action: action, data: toRaw(data), layer: layer };
+
+            frame.contentWindow.postMessage(toSend, '*');
+
+            break;
+        }
+
+        //this.command(command.page, command.action, command.data, command.layer)
+        
+
+      }, 0);
     },
 
     processCommand(command) {
       console.log("process command", command)
-      var item = command.item;
+
+      var currentChannel=this.GetCurrentChannel();
+      if (currentChannel==null) return;
+
+      var item=command.item;
+
+      switch (command.action)
+      {
+        case "off":
+          this.SendCommand(currentChannel,"play",item.layer,null,"off",true);
+          break;
+
+        default:
+          this.SendCommand(currentChannel,"play",item.layer            
+          ,item.template,item.action,item.data,false);
+          break;
+      }
 
 
-      setTimeout(() => {
-        //this.command(command.page, command.action, command.data, command.layer)
-      }, 0);
+
     },
 
     ObjectChanged(definition, value) {
@@ -232,17 +345,6 @@ export default {
       gsap.set(this.$refs[viewer], { 'background-color': color });
     },
 
-    setViewerSize(size) {
-      console.log("set viewer size: ")
-      gsap.set(this.$refs["viewer"], { width: size, height: size * 9 / 16 });
-      gsap.set(this.$refs["frame"], { scale: size / 1920 });
-    },
-    setViewerSizeTest(size) {
-      console.log("set viewer size: ")
-      gsap.set(this.$refs["viewer"], { width: size, height: size * 9 / 16 });
-      gsap.set(this.$refs["frame"], { scale: size / 1920 });
-    },
-
     getElementWidth(element) {
       var cs = getComputedStyle(element);
 
@@ -250,6 +352,13 @@ export default {
 
       var borderX = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
       return element.offsetWidth - paddingX - borderX;
+    },
+
+    checkDirty() {
+      if (this.playlist) {
+        this.dirty = !(JSON.stringify(this.playlist) === this.origPlayList);
+
+      } else this.dirty = false;
     },
 
     resizeViewers() {
@@ -278,18 +387,22 @@ export default {
         gsap.set(iframe, { scale: scale });
       })
     }
-
   },
   mounted: function () {
 
     this.templateServer = this.$route.query.ts;
+    this.preview = templateService.parseChannel(this.$route.query.p,'preview',"Preview");
+    this.main = templateService.parseChannel(this.$route.query['1'],'main',"Main");
+    this.SetActiveChannel(this.preview);
+
+    this.channels["P"]=this.preview;
+    this.channels["1"]=this.main;
 
     //    return this.$route.query;
 
     console.log("playlist mounted: ", this.$route.query);
 
-    if (this.$route.query.env)
-    {
+    if (this.$route.query.env) {
       appSettingsService.setEnv(this.$route.query.env)
     }
 
@@ -314,10 +427,14 @@ export default {
 
     var previewPaneContent = this.$refs["previewPaneParent"];
     if (previewPaneContent) this.resizeObserver.observe(previewPaneContent);
+
+    this.dirtyInterval = setInterval(() => this.checkDirty(), 2000)
+
   },
   beforeUnmount() {
     console.log("stop resize observer")
     this.resizeObserver.unobserve();
+    if (this.dirtyInterval) clearTimeout(this.dirtyInterval);
   },
 
   created: function () {
@@ -329,9 +446,12 @@ export default {
   padding: 0;
   overflow: hidden;
   background-color: black;
-  border: solid 1px red;
-  border-collapse: collapse;
+  outline: solid 5px lime; 
+}
 
+.viewer-active 
+{
+  outline: solid 5px red !important; 
 }
 
 .scaled-frame {

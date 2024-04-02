@@ -26,21 +26,153 @@ var templateDefinition = {
     }
 }
 
-var playList={
-    "layout":"wbd",
-    "title":"A test playlist",
-    "type":"folder",
-    "id":1,
-    "maxid":1,
-    "scenes":[]
+/*channel: 
+- direct
+- websocket:10.19.4.10:9991  (websocket:host[:port]) 
+- api:10.19.4.10:9951  (ui en mode websocket)
+- pusher:channel (*/
+
+
+var playList = {
+    "layout": "wbd",
+    "title": "A test playlist",
+    "type": "folder",
+    "id": 1,
+    "maxid": 1,
+    "scenes": []
 }
 
 const templateService = new (class {
 
-    setApiUrl(urlBase)
-    {
-        
+    // cg template server
+    GetTemplateServerUrlBase(ts) {
+        var toRet = '';
+
+        if (!ts) {
+            return "";
+        }
+
+        switch (ts) {
+            case "online":
+            case "remote":
+                    toRet = "https://chronorace.blob.core.windows.net/webresources/cgtemplates/index.html#/";
+                break;
+
+            case "local":
+                toRet = "http://localhost:8080/webresources/cgtemplates/index.html#/";
+                break;
+
+            default:
+                if (ts.startsWith('http')) {
+                    toRet = ts
+                }
+                else toRet = "https://" + ts + '/webresources/cgtemplates/index.html#/';
+                break;
+        }
+        return toRet;
     }
+
+    parseChannel(strChannel,defChannel,name) 
+    {
+        if (!defChannel) defChannel="default";
+
+        // channel: 
+        // - direct
+        // - websocket:10.19.4.10:9991  (websocket:host[:port]) 
+        // - api:10.19.4.10:9951  (ui en mode websocket)
+        // - pusher:channel (
+        
+        var toRet = {
+            "mode": 'host',
+            "name": name,
+            "host": "localhost",
+            "port": 9951,
+            "channel": "default",
+            "state":{}
+        };
+
+        if (strChannel==null) return toRet
+
+        var tokens=strChannel.split(':')
+        toRet.mode=tokens[0];
+        var channel=null;
+        var host=null;
+        var port=null;
+
+        if (!toRet.mode || toRet.mode=='') toRet.mode='direct';
+        if (toRet.mode=='websocket') toRet.mode='ws';
+
+        switch (toRet.mode)
+        {
+            case "direct":
+            case "pusher":
+                channel=tokens.length>1?tokens[1]:'';
+                if (!channel || channel=='') channel=defChannel
+                break;
+
+            case "ws":
+            case "api":
+                host=tokens.length>1?tokens[1]:'';
+                if (!host || host=='') host='localhost';
+                port=tokens.length>2?tokens[2]:'';
+                if ((!port || port=='') && mode=='api') port='9751';
+                if ((!port || port=='') && mode=='ws') port='9991';
+
+                break;
+
+            default:
+                channel=toRet.mode;
+                toRet.mode='pusher';                
+                break;
+        }
+
+        toRet.title=toRet.mode;
+        switch (toRet.mode)
+        {
+            case "pusher":
+                toRet.title="pusher / "+toRet.channel
+                break;
+
+            default:
+                break;
+        }
+
+
+        toRet.channel=channel;
+        toRet.host=host;
+        toRet.port=port;                
+
+        console.log("parseChannel=",strChannel)
+
+        return toRet;
+    }
+
+    buildUrl(ts,layout,channel) {
+        var toRet=this.GetTemplateServerUrlBase(ts);
+        toRet=toRet+layout.layout+'/';
+
+        switch (channel.mode)
+        {
+            case "api":
+                toRet=toRet+'ws?host='+channel.host+':'+channel.port+'&'
+                break;
+
+            case "ws":
+                toRet=toRet+'ws?host='+channel.host+':'+channel.port+'&'
+                break;
+
+            default:
+                toRet=toRet+channel.channel+'?';
+                break;
+        }
+
+        toRet=toRet+"w="+layout.resolution[0]+"&h="+layout.resolution[1]
+        //console.log("build url with resolution: ",layout.resolution)
+
+        return toRet
+    }
+
+
 
     isString(variable) {
         return typeof variable === "string";
@@ -149,18 +281,18 @@ const templateService = new (class {
             var tokens = action.split(',');
 
             var actionTokens = tokens[0].split(':');
-            var action=actionTokens[0];
-            var actionKey=actionTokens.length>1?actionTokens[1]:action;
-            if (actionKey=='') actionKey=action;
-            actionKey=scene.key+'.'+actionKey
+            var action = actionTokens[0];
+            var actionKey = actionTokens.length > 1 ? actionTokens[1] : action;
+            if (actionKey == '') actionKey = action;
+            actionKey = scene.key + '.' + actionKey
 
             var definition = (tokens.length > 1 ? tokens[1] : "");
             if (definition == '') definition = scene.template + '.' + action;
 
             var title = tokens.length > 2 ? tokens[2] : '';
-            if (title=='') title=action;
+            if (title == '') title = action;
 
-            action = { "key":actionKey, "action": action, "title": title, "definition": definition }
+            action = { "key": actionKey, "action": action, "title": title, "definition": definition }
         }
 
         action.definition = this.convertDefinition(template, action.definition);
@@ -179,14 +311,14 @@ const templateService = new (class {
             var tokens = scene.split('|');
             var sceneTokens = tokens[0].split(',');
             var templateNameTokens = sceneTokens[0].split(':');
-            var templateName=templateNameTokens[0];
-            var key=templateNameTokens.length>1?templateNameTokens[1]:templateName;
+            var templateName = templateNameTokens[0];
+            var key = templateNameTokens.length > 1 ? templateNameTokens[1] : templateName;
             var layer = sceneTokens.length > 1 ? sceneTokens[1] : 'default';
-            if (layer=='') layer='default';
+            if (layer == '') layer = 'default';
             var definition = sceneTokens.length > 2 ? sceneTokens[2] : key;
             if (definition == "") definition = templateName;
             var title = sceneTokens.length > 3 ? sceneTokens[3] : null;
-            toRet = { "key":key, "template": templateName, "layer": layer, "definition": definition, "title": title }
+            toRet = { "key": key, "template": templateName, "layer": layer, "definition": definition, "title": title }
 
             tokens.splice(0, 1);
             if (tokens.length > 0) {
@@ -224,14 +356,13 @@ const templateService = new (class {
 
         toRet.converted = true;
 
-        toRet.sortedscenes={};
+        toRet.sortedscenes = {};
 
-        toRet.scenes.forEach(scene=>{
-            toRet.sortedscenes[scene.key]=scene;
-            if (scene.actions)
-            {
-                scene.actions.forEach(action=>{
-                    toRet.sortedscenes[action.key]=action;
+        toRet.scenes.forEach(scene => {
+            toRet.sortedscenes[scene.key] = scene;
+            if (scene.actions) {
+                scene.actions.forEach(action => {
+                    toRet.sortedscenes[action.key] = action;
                 })
             }
         })
@@ -241,101 +372,109 @@ const templateService = new (class {
         return toRet;
     }
 
-    setUrlBase(url)
-    {
-        if (url==null)
-        {
-            this.apiUrlBase=null;
+    setUrlBase(url) {
+        if (url == null) {
+            this.apiUrlBase = null;
             return;
         }
 
-        switch (url)
-        {
+        switch (url) {
             case "local":
-                url="/api/graphics/casper/";
+                url = "/api/graphics/casper/";
                 break;
 
             case "dev":
-                url="http://localhost:9011/api/graphics/casper/";
+                url = "http://localhost:9011/api/graphics/casper/";
                 break;
 
             case "worker":
-                url="http://crworker.cloudapp.net:9011/api/graphics/casper/";
+                url = "http://crworker.cloudapp.net:9011/api/graphics/casper/";
                 break;
-                
+
         }
 
-        this.apiUrlBase=url;
+        this.apiUrlBase = url;
     }
 
-    getUrlBase()
-    {
+    getUrlBase() {
         if (this.apiUrlBase) return this.apiUrlBase;
-        return appSettingsService.get("apiUrlBase")+'graphics/casper/';
+        return appSettingsService.get("apiUrlBase") + 'graphics/casper/';
     }
 
-    getPlayList(layout,name)
-    {
-        var url=this.getUrlBase()+"playlist/"+layout+"/"+name;
+    savePlayList(layout, name, playlist) {
+        var url = this.getUrlBase() + "playlist/" + layout + "/" + name;
 
-        console.log("templateApiUrlBase=",url)        
+        console.log("templateApiUrlBase=", url)
 
         return new Promise((resolve, reject) => {
-            console.log("url= "+url);
+            console.log("url= " + url);
             axios
-              .get(url)
-              .then((httpReply) => {
-    
-                console.log("GetPlayList reply = ",httpReply.data)
-                if (httpReply.data==null)
-                {
-                    resolve({
-                        "layout":layout,
-                        "title":name,
-                        "type":"folder",
-                        "id":1,
-                        "version":1,
-                        "maxid":1,
-                        "scenes":[]
-                    })
-                }
-                else resolve(httpReply.data)
-              })
-              .catch((error) => {
-                if (error.response) {
-                  reject({ errorMessage: 'HTTP_' + error.response.status })
-                } else {
-                  reject(error)
-                }
-              })
-            });
-      
-
-        
+                .post(url, playlist)
+                .then((httpReply) => {
+                    resolve(httpReply.data)
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        reject({ errorMessage: 'HTTP_' + error.response.status })
+                    } else {
+                        reject(error)
+                    }
+                })
+        });
     }
 
-    deletePlayListItemByIdInternal(playlist,item,id)
-    {
-        if (item.scenes==null) return false;
-        var i=0;
-        while (i<item.scenes.length)
-        {
-            if (item.scenes[i].id==id)
-            {
-                item.scenes.splice(i,1);
+    getPlayList(layout, name) {
+        var url = this.getUrlBase() + "playlist/" + layout + "/" + name;
+
+        console.log("templateApiUrlBase=", url)
+
+        return new Promise((resolve, reject) => {
+            console.log("url= " + url);
+            axios
+                .get(url)
+                .then((httpReply) => {
+
+                    console.log("GetPlayList reply = ", httpReply.data)
+                    if (httpReply.data == null) {
+                        resolve({
+                            "layout": layout,
+                            "title": name,
+                            "type": "folder",
+                            "id": 1,
+                            "version": 1,
+                            "maxid": 1,
+                            "scenes": []
+                        })
+                    }
+                    else resolve(httpReply.data)
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        reject({ errorMessage: 'HTTP_' + error.response.status })
+                    } else {
+                        reject(error)
+                    }
+                })
+        });
+    }
+
+    deletePlayListItemByIdInternal(playlist, item, id) {
+        if (item.scenes == null) return false;
+        var i = 0;
+        while (i < item.scenes.length) {
+            if (item.scenes[i].id == id) {
+                item.scenes.splice(i, 1);
                 return true;
             }
-            if (this.deletePlayListItemByIdInternal(playlist,item.scenes[i],id)) return true;
+            if (this.deletePlayListItemByIdInternal(playlist, item.scenes[i], id)) return true;
             i++;
         }
         return false
     }
-    
-    deletePlayListItemById(playlist,id)
-    {
-        if (this.deletePlayListItemByIdInternal(playlist,playlist,id))
-        {
-            playlist.dirty=true
+
+    deletePlayListItemById(playlist, id) {
+        if (this.deletePlayListItemByIdInternal(playlist, playlist, id)) {
+            playlist.dirty = true
         }
 
         return playlist
@@ -344,7 +483,7 @@ const templateService = new (class {
     get(layout) {
         var toRet = this.processTemplateDefinition(templateDefinition);
 
-        console.log("URL base ",this.apiUrlBase)
+        console.log("URL base ", this.apiUrlBase)
 
         return Promise.resolve(toRet);
     }
