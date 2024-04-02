@@ -287,8 +287,19 @@ const templateService = new (class {
               .then((httpReply) => {
     
                 console.log("GetPlayList reply = ",httpReply.data)
-                
-                resolve(httpReply.data)
+                if (httpReply.data==null)
+                {
+                    resolve({
+                        "layout":layout,
+                        "title":name,
+                        "type":"folder",
+                        "id":1,
+                        "version":1,
+                        "maxid":1,
+                        "scenes":[]
+                    })
+                }
+                else resolve(httpReply.data)
               })
               .catch((error) => {
                 if (error.response) {

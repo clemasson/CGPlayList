@@ -22,8 +22,6 @@ export default {
   mounted: function () {
     console.log("App mounted lalala ",this.$route.query)
 
-    var route = useRoute();
-    console.log("mmmhhh ",route.query)
 
     if (this.$route.query.env)
     {
