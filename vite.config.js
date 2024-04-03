@@ -17,6 +17,8 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 5000,
   },
+  base:'/playlist/',
+
   server: {
     port: 5173,
     host: true

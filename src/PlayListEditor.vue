@@ -66,7 +66,7 @@
                 </tbody>
               </VTable>
 
-              <pre>{{ preview }}</pre>
+              
 
             </div>
             <div :style="{ width: ((1 - this.viewersRatio) * 100) + '%' }" style="padding:5px;overflow: hidden">
@@ -88,10 +88,10 @@
                 </div>
               </div>
 
-              <a class="app-link text-primary" :href="GetTemplateUrl(preview)" target="_blank">{{ GetTemplateUrl(main)
+              <a class="app-link text-primary" :href="GetTemplateUrl(main)" target="_blank">{{ GetTemplateUrl(main)
                 }}</a>
 
-              <pre>{{ main }}</pre>
+
 
             </div>
           </div>
@@ -117,8 +117,6 @@
 import { VBtn } from 'vuetify/lib/components/index.mjs';
 import templateService from '@/services/templateService'
 import appSettingsService from '@/services/appSettingsService'
-
-import hotkeys from 'hotkeys-js'
 
 import { toRaw } from "vue"
 import { gsap } from "gsap";
@@ -151,7 +149,7 @@ export default {
     GetTemplateUrl(cnl) {
       if (!this.layout) return "";
       var toRet = templateService.buildUrl(this.templateServer, this.layout, cnl);
-      console.log("templateServer=", this.templateServer, toRet)
+      //console.log("templateServer=", this.templateServer, toRet)
 
       return toRet
     },
@@ -252,6 +250,7 @@ export default {
       return this.activeChannel;
     },
 
+
     SendCommand(channel,command,layer,page,action,data,off)
     {      
       console.log("send command ",command,"/",page," on layer ",layer)
@@ -278,9 +277,11 @@ export default {
           break;
       }
 
+
+
       setTimeout(() => {
         switch (channel.mode)
-        {
+        {          
           case "direct":
             var frame=this.$refs[channel.channel]
             console.log("frame = ",frame)
@@ -289,6 +290,11 @@ export default {
 
             frame.contentWindow.postMessage(toSend, '*');
 
+            break;
+
+          default:
+            console.log("lala??")
+            templateService.command(channel,command,layer,page,action,data==null?null:toRaw(data))
             break;
         }
 
@@ -309,7 +315,7 @@ export default {
       switch (command.action)
       {
         case "off":
-          this.SendCommand(currentChannel,"play",item.layer,null,"off",true);
+          this.SendCommand(currentChannel,"play",item.layer,null,"off",null,true);
           break;
 
         default:

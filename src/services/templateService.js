@@ -1,6 +1,7 @@
 import axios from 'axios'
 import appSettingsService from './appSettingsService'
 
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
@@ -493,7 +494,7 @@ const templateService = new (class {
 
     getLayoutDefinition(layout) {
         var toRet = new Promise((resolve, reject) => {
-            const url = '/data/' + layout + '.json?rnd=' + getRandomInt(100000000);
+            const url = 'data/' + layout + '.json?rnd=' + getRandomInt(100000000);
 
             axios
                 .get(url)
@@ -518,6 +519,46 @@ const templateService = new (class {
         console.log("URL base ", this.apiUrlBase)
 
         return Promise.resolve(toRet);*/
+    }
+
+    command(channel,command,layer,page,action,data)
+    {
+        if (!data) data={}
+
+        data.layer=layer;
+        data.action=action;
+        data.page=page;
+
+        var cgCommand={ command: command, settings:data }
+
+        switch (channel.mode)
+        {
+            case "pusher":
+                data.pusher=channel.channel;
+                break;
+        }
+
+        console.log("send command to api: ",cgCommand)
+
+        var url = this.getUrlBase() + "command/" +channel.mode;
+
+        return new Promise((resolve, reject) => {
+            console.log("url= " + url);
+            axios
+                .post(url,cgCommand)
+                .then((httpReply) => {
+                    resolve(httpReply.data)
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        reject({ errorMessage: 'HTTP_' + error.response.status })
+                    } else {
+                        reject(error)
+                    }
+                })
+        });
+
+        return toRet        
     }
 
     constructor() {
