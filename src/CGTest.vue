@@ -127,8 +127,6 @@ export default {
 </script>
 <style>
 body,html {
-  width: 1920px;
-  height: 1080px;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -146,21 +144,4 @@ body,html {
   border-collapse: collapse;
 }
 
-.scaled-frame {
-  width: 1920px;
-  height: 1080px;
-  border: 0px;
-}
-
-.scaled-frame {
-  zoom: 1;
-  -webkit-transform: scale(0.1);
-  -webkit-transform-origin: 0 0;
-}
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  .scaled-frame {
-    zoom: 1;
-  }
-}
 </style>

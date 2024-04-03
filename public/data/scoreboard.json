@@ -1,0 +1,17 @@
+{
+    "layout": "WBD",
+    "resolution": [2288, 1144],
+
+    "scenes":
+        [
+            "backgroundvideo,bg,,C2.61 - Video",
+            "startlight,default,,Lights|update|toggle|setred|setgreen|setblack"
+
+        ],
+    "definitions":
+    {
+        "startlight":["state|dropdown,-,red,green,black"],
+        "startlight.update":["*startlight","toggle|boolean,0,1"],
+        "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"]
+    }
+}

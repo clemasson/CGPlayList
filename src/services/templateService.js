@@ -1,7 +1,11 @@
 import axios from 'axios'
 import appSettingsService from './appSettingsService'
 
-var templateDefinition = {
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+/*var templateDefinition = {
     "layout": "WBD",
     "resolution": [1920, 1080],
 
@@ -23,6 +27,17 @@ var templateDefinition = {
         "name.showspeed": ["speed|text"],
         "dualname": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"],
         "mode": ["mode|dropdown,red,green"]
+    }
+}*/
+
+var wbdDefinition = {
+    "layout": "WBD",
+    "resolution": [2288, 1144],
+
+    "scenes": [],
+    "definitions":
+    {
+
     }
 }
 
@@ -55,7 +70,7 @@ const templateService = new (class {
         switch (ts) {
             case "online":
             case "remote":
-                    toRet = "https://chronorace.blob.core.windows.net/webresources/cgtemplates/index.html#/";
+                toRet = "https://chronorace.blob.core.windows.net/webresources/cgtemplates/index.html#/";
                 break;
 
             case "local":
@@ -72,65 +87,62 @@ const templateService = new (class {
         return toRet;
     }
 
-    parseChannel(strChannel,defChannel,name) 
-    {
-        if (!defChannel) defChannel="default";
+    parseChannel(strChannel, defChannel, name) {
+        if (!defChannel) defChannel = "default";
 
         // channel: 
         // - direct
         // - websocket:10.19.4.10:9991  (websocket:host[:port]) 
         // - api:10.19.4.10:9951  (ui en mode websocket)
         // - pusher:channel (
-        
+
         var toRet = {
             "mode": 'host',
             "name": name,
             "host": "localhost",
             "port": 9951,
             "channel": "default",
-            "state":{}
+            "state": {}
         };
 
-        if (strChannel==null) return toRet
+        if (strChannel == null) return toRet
 
-        var tokens=strChannel.split(':')
-        toRet.mode=tokens[0];
-        var channel=null;
-        var host=null;
-        var port=null;
+        var tokens = strChannel.split(':')
+        toRet.mode = tokens[0];
+        var channel = null;
+        var host = null;
+        var port = null;
 
-        if (!toRet.mode || toRet.mode=='') toRet.mode='direct';
-        if (toRet.mode=='websocket') toRet.mode='ws';
+        if (!toRet.mode || toRet.mode == '') toRet.mode = 'direct';
+        if (toRet.mode == 'websocket') toRet.mode = 'ws';
 
-        switch (toRet.mode)
-        {
+        switch (toRet.mode) {
             case "direct":
             case "pusher":
-                channel=tokens.length>1?tokens[1]:'';
-                if (!channel || channel=='') channel=defChannel
+                channel = tokens.length > 1 ? tokens[1] : '';
+                if (!channel || channel == '') channel = defChannel
                 break;
 
             case "ws":
             case "api":
-                host=tokens.length>1?tokens[1]:'';
-                if (!host || host=='') host='localhost';
-                port=tokens.length>2?tokens[2]:'';
-                if ((!port || port=='') && mode=='api') port='9751';
-                if ((!port || port=='') && mode=='ws') port='9991';
+                host = tokens.length > 1 ? tokens[1] : '';
+                if (!host || host == '') host = 'localhost';
+                port = tokens.length > 2 ? tokens[2] : '';
+                if ((!port || port == '') && mode == 'api') port = '9751';
+                if ((!port || port == '') && mode == 'ws') port = '9991';
 
                 break;
 
             default:
-                channel=toRet.mode;
-                toRet.mode='pusher';                
+                channel = toRet.mode;
+                toRet.mode = 'pusher';
                 break;
         }
 
-        toRet.title=toRet.mode;
-        switch (toRet.mode)
-        {
+        toRet.title = toRet.mode;
+        switch (toRet.mode) {
             case "pusher":
-                toRet.title="pusher / "+toRet.channel
+                toRet.title = "pusher / " + toRet.channel
                 break;
 
             default:
@@ -138,35 +150,34 @@ const templateService = new (class {
         }
 
 
-        toRet.channel=channel;
-        toRet.host=host;
-        toRet.port=port;                
+        toRet.channel = channel;
+        toRet.host = host;
+        toRet.port = port;
 
-        console.log("parseChannel=",strChannel)
+        console.log("parseChannel=", strChannel)
 
         return toRet;
     }
 
-    buildUrl(ts,layout,channel) {
-        var toRet=this.GetTemplateServerUrlBase(ts);
-        toRet=toRet+layout.layout+'/';
+    buildUrl(ts, layout, channel) {
+        var toRet = this.GetTemplateServerUrlBase(ts);
+        toRet = toRet + layout.layout + '/';
 
-        switch (channel.mode)
-        {
+        switch (channel.mode) {
             case "api":
-                toRet=toRet+'ws?host='+channel.host+':'+channel.port+'&'
+                toRet = toRet + 'ws?host=' + channel.host + ':' + channel.port + '&'
                 break;
 
             case "ws":
-                toRet=toRet+'ws?host='+channel.host+':'+channel.port+'&'
+                toRet = toRet + 'ws?host=' + channel.host + ':' + channel.port + '&'
                 break;
 
             default:
-                toRet=toRet+channel.channel+'?';
+                toRet = toRet + channel.channel + '?';
                 break;
         }
 
-        toRet=toRet+"w="+layout.resolution[0]+"&h="+layout.resolution[1]
+        toRet = toRet + "w=" + layout.resolution[0] + "&h=" + layout.resolution[1]
         //console.log("build url with resolution: ",layout.resolution)
 
         return toRet
@@ -480,12 +491,33 @@ const templateService = new (class {
         return playlist
     }
 
-    get(layout) {
-        var toRet = this.processTemplateDefinition(templateDefinition);
+    getLayoutDefinition(layout) {
+        var toRet = new Promise((resolve, reject) => {
+            const url = '/data/' + layout + '.json?rnd=' + getRandomInt(100000000);
+
+            axios
+                .get(url)
+                .then((httpReply) => {
+
+                    console.log("http reply ", httpReply)
+                    resolve(this.processTemplateDefinition(httpReply.data))
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        reject({ errorMessage: 'HTTP_' + error.response.status })
+                    } else {
+                        reject(error)
+                    }
+                })
+        })
+
+        return toRet
+
+        /*var toRet = this.processTemplateDefinition(templateDefinition);
 
         console.log("URL base ", this.apiUrlBase)
 
-        return Promise.resolve(toRet);
+        return Promise.resolve(toRet);*/
     }
 
     constructor() {

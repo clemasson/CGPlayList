@@ -44,7 +44,7 @@
               <div style="position:relative;padding:5px;margin-top: 8px;overflow: hidden;"  >
                 <div class="viewer" :class="{'viewer-active':preview.active}" ref="viewer1" style="position:relative">
                   <div @click.stop="SetActiveChannel(preview)" style="z-index: 10; position:absolute;width:100%;height:100%"></div>
-                  <iframe ref="preview" class="scaled-frame" scrolling:="no" :src="GetTemplateUrl(preview)"></iframe>
+                  <iframe ref="preview" class="cg-scaled-frame" scrolling:="no" :src="GetTemplateUrl(preview)"></iframe>
                 </div>
               </div>
 
@@ -83,7 +83,7 @@
               <div style="position:relative;padding:5px;margin-top: 8px;overflow: hidden;"  >
                 <div class="viewer" :class="{'viewer-active':main.active}" ref="viewer2"> 
                   <div @click.stop="SetActiveChannel(main)" style="z-index: 10; position:absolute;width:100%;height:100%"></div>
-                  <iframe ref="main" style="position:relative;display: relative;" class="scaled-frame" scrolling:="no"
+                  <iframe ref="main" style="position:relative;display: relative;" class="cg-scaled-frame" scrolling:="no"
                     :src="GetTemplateUrl(main)"></iframe>
                 </div>
               </div>
@@ -118,9 +118,9 @@ import { VBtn } from 'vuetify/lib/components/index.mjs';
 import templateService from '@/services/templateService'
 import appSettingsService from '@/services/appSettingsService'
 
+import hotkeys from 'hotkeys-js'
+
 import { toRaw } from "vue"
-
-
 import { gsap } from "gsap";
 import { getCurrentInstance, toHandlers } from 'vue';
 
@@ -226,10 +226,13 @@ export default {
         this.origPlayList = JSON.stringify(playlist);
       })
 
-      templateService.get(this.layoutName).then(layout => {
+      templateService.getLayoutDefinition(this.layoutName).then(layout => {
+        console.log("GetLayoutDefinition ok")
         this.layout = layout;
         this.loading = false;
         this.resizeViewers();
+      },error=>{
+        console.log("AN ERROR OCCURED ",error)
       })
     },
 
@@ -380,11 +383,11 @@ export default {
         console.log("viewer ", width, this.layout.resolution[0], aspectRation)
 
         var iframe = viewer.querySelectorAll("iframe");
-        console.log("IFrame ", iframe, width, width * 9 / 16)
+        console.log("IFrame ",  width, width / aspectRation)
 
         gsap.set(viewer, { width: width, height: width / aspectRation });
 
-        gsap.set(iframe, { scale: scale });
+        gsap.set(iframe, { scale: scale,width:this.layout.resolution[0],height:this.layout.resolution[1] });
       })
     }
   },
@@ -397,6 +400,40 @@ export default {
 
     this.channels["P"]=this.preview;
     this.channels["1"]=this.main;
+
+
+    console.log("document ",document)
+
+    /*hotkeys('f1', {keyup: true},function(event, handler){
+      // Prevent the default refresh event under WINDOWS system
+      event.preventDefault()
+      console.log("F1 PRESSED")
+      return false;
+    });
+    hotkeys('f2', {keyup: true},function(event, handler){
+      // Prevent the default refresh event under WINDOWS system
+      event.preventDefault()
+      console.log("F2 PRESSED")
+      return false;
+    });*/
+
+    document.addEventListener("keydown", function(e)
+    {
+      if (e.key=='F1')
+      {
+        console.log("keydown: ",e.key,e)
+        e.preventDefault();
+        return false;
+      }
+      if (e.key=='F2')
+      {
+        console.log("keydown: ",e.key,e)
+        e.preventDefault();
+        return false;
+      }
+
+    },true);
+
 
     //    return this.$route.query;
 
@@ -435,6 +472,8 @@ export default {
     console.log("stop resize observer")
     this.resizeObserver.unobserve();
     if (this.dirtyInterval) clearTimeout(this.dirtyInterval);
+
+    hotkeys.unbind();
   },
 
   created: function () {
@@ -454,18 +493,14 @@ export default {
   outline: solid 5px red !important; 
 }
 
-.scaled-frame {
-  width: 1920px;
-  height: 1080px;
+.cg-scaled-frame {
   border: 0px;
   zoom: 1;
-
-  -webkit-transform: scale(0.1);
   -webkit-transform-origin: 0 0;
 }
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
-  .scaled-frame {
+  .cg-scaled-frame {
     zoom: 1;
   }
 }

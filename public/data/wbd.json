@@ -1,0 +1,24 @@
+{
+    "layout": "WBD",
+    "resolution": [1920, 1080],
+
+    "scenes":
+        [
+            "watermark,wat,,C2.1 - Watermark",
+            "background,bg,,C2.60 - Still",
+            "backgroundvideo,bg,,C2.61 - Video",
+            "name,,,C2.1 lower third 1 line|showspeed|hidespeed",
+            "name,,,C2.2 lower2 lines|showspeed|hidespeed",
+            "dualname,default,,2 Names"
+        ],
+    "definitions":
+    {
+        "watermark": ["logo,Logo|dropdown,xco,xcc,dhi|Watermark picture"],
+        "background": ["image,Image,Background image|text"],
+        "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"],
+        "name": ["name|text", "team|text", "nat|text"],
+        "name.showspeed": ["speed|text"],
+        "dualname": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"],
+        "mode": ["mode|dropdown,red,green"]
+    }
+}
