@@ -1,6 +1,7 @@
 <template>
-  <VTextField density="compact" :model-value="value" variant="solo"
+  <VTextarea density="compact" :model-value="value" variant="solo"
    @input="ProcessInput($event)"
+   rows="10"
    :persistent-hint="definition.description && definition.description!=''"
    :hint="definition.description"
     :label="definition.name || definition.field">
@@ -8,7 +9,7 @@
       <v-btn tabindex="-1" v-if="value!=null" icon="mdi-close" color="red" variant="text" size="small" @click="SetNull()">
       </v-btn>
     </template>
-  </VTextField>
+  </VTextarea>
   
 </template>
     

@@ -85,7 +85,7 @@ export default {
         },
 
         getType(element) {
-            console.log("gettype", element)
+            //console.log("gettype", element)
             switch (element.type) {
                 case "folder":
                     return "Folder";
@@ -95,63 +95,36 @@ export default {
             }
         },
 
-        EditScene() {
-            console.log("EDIT SCENE ", this.item.type);
-            switch (this.item.type) {
-                case "scene":
-                case "action":
-                    console.log("layout ", this.layout)
-                    this.$refs["itemEditor"].Edit(this.item, this.layout).then(reply => {
-                        console.log("itemeditor reply=", reply)
-                        if (reply.key == 'OK') {
-                            this.item.title = reply.item.title;
-                            this.item.data = reply.item.data;
-                        }
-                    });
+        EditScene(item) {
+            if (!item) item=this.item
 
-                default:
-                    break;
-            }
+            return new Promise((resolve,reject)=>{
+                //console.log("EDIT SCENE ", item.type);
+                switch (item.type) {
+                    case "scene":
+                    case "action":
+                        //console.log("layout ", this.layout,this.$refs["itemEditor"])
+                        this.$refs["itemEditor"].Edit(item, this.layout).then(reply => {
 
-        },
-        AddFolder() {
-            console.log("Add folder");
-            this.$refs["ui"].editText("Create folder", "Folder name", "Name").then(reply => {
-                console.log("add folder reply", reply)
+                            console.log("itemeditor reply=", reply)
+                            if (reply.key == 'OK') {
+                                item.title = reply.item.title;
+                                item.data = reply.item.data;
+                                resolve(item);
+                                return;
+                            }                            
+                        });
+                        return;
 
-                if (reply.key == 'OK') {
-                    var toAdd = { type: "folder", "title": reply.data, scenes:[] }
-
-                    var playlist = this.playlist;
-                    if (!playlist) playlist = this.item;
-
-                    toAdd.id = ++playlist.maxid;
-                    this.item.scenes.push(toAdd)
-                    this.collapsed = false
-
+                    default:
+                        break;
                 }
+
+                reject();
             })
         },
-        AddScene() {
-            console.log("add scene");
 
-            this.$refs["ui"].select("Add scene", "Select scene to add", this.layout.scenes).then(reply => {
-                console.log("reply ", reply)
 
-                var toAdd = { "type": "scene", "title": reply.item.title, data: null, layer: reply.item.layer, template: reply.item.template, layoutkey: reply.item.key };
-                console.log("Add ", toAdd)
-
-                if (!this.item.scenes) this.item.scenes = []
-
-                var playlist = this.playlist;
-                if (!playlist) playlist = this.item;
-
-                toAdd.id = ++playlist.maxid;
-                this.item.scenes.push(toAdd)
-                this.collapsed = false
-
-            })
-        },
         select() {
 
         },

@@ -5,8 +5,12 @@ import appSettingsService from './appSettingsService'
  * 
 Field:
 -----------
-field,name,help|type,args|validators
+field,name,help|type,args|defaultvalue|validators
 	- type: text|array|object|dropdown|boolean
+
+- object:   object,definition
+- dropdown: dropdown,v1,v2,v3
+- boolean: boolean,trueval,falseval
 
 if field starts with *, will copy reference to an other defintiion
 
@@ -225,12 +229,10 @@ const templateService = new (class {
                 var relatedDefinition = this.convertDefinition(template, template.definitions[tokens[0].substring(1)])
                 relatedDefinition.forEach(d => definition.push(d))
 
-
                 console.log("add a definition reference", definition, relatedDefinition)
-
             }
             else {
-                // syntax: field,name,help|type,args|validators
+                // syntax: field,name,help|type,args|defaultvalue|validators
                 // type: can be a reference is prefixed with *
                 var fieldNameTokens = tokens[0].split(',');
 
@@ -242,10 +244,19 @@ const templateService = new (class {
                 var toAdd = {
                     field: field, name: name, description: description
                 }
-
+                
                 //console.log("field name",field,name,description)                
+                if (tokens.length>2)
+                {
+                    toAdd.default=tokens[2]
+                    if (toAdd.default=='') toAdd.default=null;
+                }
 
-                var typeTokens = (tokens.length > 1 ? tokens[1] : 'text').split(',');
+                var typeToken=(tokens.length > 1 ? tokens[1] : 'text');
+                if (typeToken=='') typeToken='text'
+
+                var typeTokens = typeToken.split(',');
+                
                 var type = typeTokens[0];
                 typeTokens.splice(0, 1)
                 if (type.startsWith("*")) {
@@ -266,6 +277,23 @@ const templateService = new (class {
 
                         if (typeTokens.length > 0) {
                             toAdd.childs = this.convertDefinition(template, typeTokens[0]);
+                        }
+                        if (typeTokens.length > 1) {
+                            toAdd.title = typeTokens[1];
+                        } else if (toAdd.childs && toAdd.childs.length>0)
+                        {
+                            toAdd.title=toAdd.childs[0].field
+                        }
+                        break;
+
+                    case "boolean":
+                        if (typeTokens.length>0)
+                        {
+                            toAdd.true=typeTokens[0]
+                        }
+                        if (typeTokens.length>1)
+                        {
+                            toAdd.false=typeTokens[1]
                         }
                         break;
 
@@ -549,6 +577,8 @@ const templateService = new (class {
     command(channel,command,layer,page,action,data)
     {
         if (!data) data={}
+
+        data=JSON.parse(JSON.stringify(data))
 
         data.layer=layer;
         data.action=action;

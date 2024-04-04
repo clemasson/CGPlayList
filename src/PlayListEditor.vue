@@ -62,8 +62,9 @@
                   <tr v-for="(item,key) in preview.state" :key="key" >
                     <td>{{ key }}</td>
                     <td>{{ item.template }}</td>
-                    <td>
+                    <td class="text-right">
                       <VBtn size="x-small" color="warning" @click="SendCommand(preview,'play',key,null,'off',null,true);" icon="mdi-minus"></VBtn>
+                      <VBtn size="x-small" class="ml-2" xcolor="primary" @click="takeIn(key)" icon="mdi-chevron-right"></VBtn>
                     </td>
                   </tr>
                 </tbody>
@@ -105,7 +106,7 @@
                   <tr v-for="(item,key) in main.state" :key="key" >
                     <td>{{ key }}</td>
                     <td>{{ item.template }}</td>
-                    <td>
+                    <td class="text-right">
                       <VBtn size="x-small" color="warning" @click="SendCommand(main,'play',key,null,'off',null,true);" icon="mdi-minus"></VBtn>
                     </td>
                   </tr>
@@ -498,7 +499,6 @@ export default {
     this.layoutName = this.$route.params.layout;
     this.playlistName = this.$route.params.playlist;
     this.LoadPlayList();
-
 
     // Create a ResizeObserver instance and specify the callback function
     this.resizeObserver = new ResizeObserver(entries => {

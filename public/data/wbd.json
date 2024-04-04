@@ -6,22 +6,65 @@
         [
             "watermark,wat,,C2.1 - Watermark",
             "safe,safe,,Safe zone",
+            "countdown,default,,C2.11 - Countdown",
+            "copyright,default,,C2.16 - Copyright",
+            "localisation:name,,namemode,Lower third - all varations",
+            "dualname,default,,2 Names",
+            "localisation:nextevent,,,C2.19 - Next Event",
+            "localisation:weather,,,C2.13 - Weather",
+            "textinfoboard,default,,C2.56 - edito facts",
+            "ficheduo,default,,C2.57 - head 2 head",
+            "fichetrio,default,,C2.57 - trio",
+            "fiche,default,,C2.58 - fiche",
+            "teampresentation,default,,C2.58 Team presentation",
+            "schedule,default,,C2.59 - schedule",
             "background,bg,,C2.60 - Still",
-            "backgroundvideo,bg,,C2.61 - Video",
-            "localisation:name,,namemode,C2.1 lower third 1/2 lines",
-            "dualname,default,,2 Names"
+            "backgroundvideo,bg,,C2.61 - Video"
         ],
     "definitions":
     {
         "watermark": ["discipline,discipline|dropdown,xco,xcc,dhi|Watermark picture"],
         "background": ["image,Image,Background image|dropdown,bg1,dve_3070,dve_5050,dve_7030"],
-        "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"],
+        "backgroundvideo": ["video,Video file name,Video file name (empty use default video)|text"],
         "namemode": ["*mode","*name"],
-        "align":["align|dropdown,left,right,dve3070-left,dve3070-right,dve5050-left,dve5050-right,dve7030-left,dve7030-right"],
-        "name": ["*align","name|text", "team|text", "nat|text","bib","pos","*arrow"],
+        "align":["align|dropdown,left,right,dve3070-left,dve3070-right,dve5050-left,dve5050-right,dve7030-left,dve7030-right|left"],
+        "alignright":["align|dropdown,left,right,dve3070-left,dve3070-right,dve5050-left,dve5050-right,dve7030-left,dve7030-right|right"],
+        "name": ["*align","firstname|text","lastname|text", "team|text", "nat|text","bib","pos","*arrow","*bio"],
         "name.showspeed": ["speed|text"],
         "dualname": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"],
         "mode": ["mode|dropdown,red,green"],
-        "arrow": ["enarrow|boolean","picture"]
+        "arrow": ["enarrow|boolean","picture"],
+        "bio": ["enbio|boolean","bio|array,bioitems,title"],
+        "bioitems":["title","value"],
+        "copyright":["items|array,copyrightitems,text"],
+        "copyrightitems":["text"],
+        "nextevent":["*mode","lastname,name|text|NEXT EVENTS","enearthleft|boolean,1,0|1","*align","items,lines|array,nexteventitems,text"],
+        "nexteventitems":["text","nat"],
+        "weather":["*mode","lastname,name|text","enearthleft|boolean,1,0|1","*alignright"
+            ,"*localisationdetails"
+            ,"items,lines|array,nexteventitems,text"
+            ,"entitle|boolean,1,0|0"
+            ,"title"
+            ,"enearthright|boolean,1,0|0"],
+        "localisationdetails":["endetails,enable weatherdetails|boolean,1,0|1","localisationdetails,weather details|array,localisationdetailsitem,title"],
+        "localisationdetailsitem":["title","text"],
+        "textinfoboard":["*mode","title","subtitle","text|textarea"],
+        "schedule":["*mode","location","country","sections|array,schedulesection,subtitle"],
+        "schedulesection":["*mode","title","subtitle","items|array,schedulesectionitem,time"],
+        "schedulesectionitem":["time","zone","text"],
+        "logo":["logo|dropdown,xco,xcc,dhi"],
+        "ficherider":["firstname","lastname","nat","picture"],
+        "fiche":["*logo","*mode","title","rider|object,ficherider","items|array,ficheitem,title"],
+        "ficheitem":["type|dropdown,data,separator|data","title","text"],
+        "ficheduo":["*logo","*mode","title","rider1|object,ficherider","rider2|object,ficherider","items|array,ficheduoitem,title"],
+        "ficheduoitem":["type|dropdown,data,longtitle,separator|data","title","text1","text2"],
+
+        "fichetrio":["*logo","*mode","title","rider1|object,fichetriorider","rider2|object,fichetriorider","rider3|object,fichetriorider"],
+        "fichetriorider":["firstname","lastname","nat","team","picture","items|array,fichetriorideritem,title"],
+        "fichetriorideritem":["title","text|textarea"],
+        "teampresentation":["*mode","title|text|TEAM","subtitle","*logo","riders|array,teampresentationrider,lastname"],
+        "teampresentationrider":["role","firstname","lastname","datatitle|text|AGE","datavalue,,Age","nat","picture"],
+        "countdown":["*mode","title","start,,UTC time - eg: 2024-04-15 15:00:00|text","*alignright"]
+
     }
 }

@@ -2,7 +2,7 @@
   <VExpansionPanels v-model="panels" multiple class="mb-2 " v-if="definition">
     <VExpansionPanel value="main" >
       <VExpansionPanelTitle class="pt-0 pb-0">
-        <h3>{{ definition.field }}</h3>
+        <h3>{{ definition.name || definition.field }}</h3>
         <VSpacer></VSpacer>
         <VBtn tabindex="-1" variant="text" v-if="value" size="small" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
         </VBtn>
@@ -36,12 +36,13 @@
   import BooleanEditor from '@/components/BooleanEditor.vue'
   import DropDownEditor from '@/components/DropDownEditor.vue'
   import TextEditor from '@/components/TextEditor.vue'
+  import TextareaEditor from '@/components/TextareaEditor.vue'
   //import UITools from '@/components/UITools.vue'
   import { toRaw } from "vue"
 
   
   export default {
-    components: { TextEditor,DropDownEditor,DropdownEditor:DropDownEditor,BooleanEditor,ArrayEditor },
+    components: { TextEditor,DropDownEditor,DropdownEditor:DropDownEditor,BooleanEditor,ArrayEditor,TextareaEditor },
     props: ["obj", "definition","value","expand"],
     emits: ["change"],
 
@@ -74,7 +75,16 @@
       Create()
       {
         //this.obj[this.definition.field]=[];
-        this.$emit("change",this.definition,{})
+        var obj={};
+
+        if (this.definition.childs)
+        {
+          this.definition.childs.forEach(child=>{
+            obj[child.field]=child.default;
+          })
+        }
+
+        this.$emit("change",this.definition,obj)
         this.panels=["main"]
       },
 

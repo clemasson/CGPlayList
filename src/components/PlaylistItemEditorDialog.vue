@@ -1,5 +1,5 @@
 <template>
-  <VDialog v-model="showDialog" name="dlgEdit" persistent max-width="400">
+  <VDialog v-model="showDialog" name="dlgEdit" persistent max-width="900">
     <VCard>
       <VCardTitle class="headline" v-if="title">
         <span>{{ title }}</span>
@@ -80,7 +80,6 @@ import ObjectEditor  from "./ObjectEditor.vue"
         this.dialog=false
 
         this.promiseResolve( { key: action,item: this.item, scene: this.scene } )
-
       } 
       else if (action.action)
       {
@@ -139,7 +138,7 @@ import ObjectEditor  from "./ObjectEditor.vue"
     
     Edit(item,layout,title)
     {
-      //console.log("Edit Called");
+      console.log("Edit Called");
 
       this.SetActions([{ key:'OK',action: ()=>{
         //validate
@@ -172,7 +171,9 @@ import ObjectEditor  from "./ObjectEditor.vue"
       } },{ key: 'CANCEL' }]);
     
 
-      //console.log("playlistitem",item)
+      console.log("playlistitem",item)
+
+
       this.item=JSON.parse(JSON.stringify(item));
       this.title="Edit";
       
@@ -181,13 +182,16 @@ import ObjectEditor  from "./ObjectEditor.vue"
       if (this.scene && this.scene.definition.length>0)
       {
       //console.log("item we edit: ",item)
-      this.definition={field:'data',childs:this.scene.definition};
-      this.showDialog=true
-      this.errorMessage=null
+        this.definition={field:'data',childs:this.scene.definition};
+        
       } else
       {
         this.definition=null;
+        this.item.data={}
       }
+
+      this.showDialog=true
+      this.errorMessage=null
 
 
       return new Promise((resolve,reject)=>{

@@ -12,12 +12,13 @@
   import BooleanEditor from '@/components/BooleanEditor.vue'
   import DropDownEditor from '@/components/DropDownEditor.vue'
   import TextEditor from '@/components/TextEditor.vue'
-  //import UITools from '@/components/UITools.vue'
+  import TextareaEditor from '@/components/TextareaEditor.vue'
+//import UITools from '@/components/UITools.vue'
   import { toRaw } from "vue"
 
   
   export default {
-    components: { TextEditor,DropDownEditor,DropdownEditor:DropDownEditor,BooleanEditor,ArrayEditor },
+    components: { TextEditor,DropDownEditor,DropdownEditor:DropDownEditor,BooleanEditor,ArrayEditor,TextareaEditor },
     props: ["obj", "definition","value"],
     emits: ["change"],
 

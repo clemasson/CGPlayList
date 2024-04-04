@@ -136,26 +136,60 @@ export default {
                 }
             })
         },
-        AddScene() {
-            console.log("add scene");
 
+        EditScene(item) {
+            if (!item) item=this.item
+
+            return new Promise((resolve,reject)=>{
+                //console.log("EDIT SCENE ", item.type);
+                switch (item.type) {
+                    case "scene":
+                    case "action":
+                        //console.log("layout ", this.layout,this.$refs["itemEditor"])
+                        this.$refs["itemEditor"].Edit(item, this.layout).then(reply => {
+                            console.log("itemeditor reply=", reply)
+                            if (reply.key == 'OK') {
+                                item.title = reply.item.title;
+                                item.data = reply.item.data;
+                                resolve(item);
+                                return;
+                            }
+                            reject(); 
+                        });
+                        return;
+
+                    default:
+                        break;
+                }
+
+                reject();
+            })
+        },
+
+        AddScene() {
             this.$refs["ui"].select("Add scene", "Select scene to add", this.layout.scenes).then(reply => {
-                console.log("reply ", reply)
+                if (reply.action!='select') return;
 
                 var toAdd = { "type": "scene", "title": reply.item.title, data: null, layer: reply.item.layer, template: reply.item.template, layoutkey: reply.item.key };
-                console.log("Add ", toAdd)
-
+                console.log("Add AND edit ", toAdd)
+                
                 if (!this.item.scenes) this.item.scenes = []
 
                 var playlist = this.playlist;
                 if (!playlist) playlist = this.item;
 
-                toAdd.id = ++playlist.maxid;
-                this.item.scenes.push(toAdd)
-                this.collapsed = false
+                this.EditScene(toAdd).then(editReply=>
+                {
+                    console.log("edit reply",editReply)
 
+                    toAdd.id = ++playlist.maxid;
+                    this.item.scenes.push(toAdd)                    
+                    this.collapsed = false
+
+                })
             })
         },
+
         add(evt)
         {
             console.log("add called ",evt)

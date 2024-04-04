@@ -106,7 +106,7 @@ export default {
         },
 
         getType(element) {
-            console.log("gettype", element)
+            //console.log("gettype", element)
             switch (element.type) {
                 case "folder":
                     return "Folder";
@@ -118,44 +118,60 @@ export default {
                     return "Scene";
             }
         },
-        EditScene() {
-            console.log("EDIT SCENE ", this.item.type);
-            switch (this.item.type) {
-                case "scene":
-                case "action":
-                    console.log("layout ", this.layout)
-                    this.$refs["itemEditor"].Edit(this.item, this.layout).then(reply => {
-                        console.log("itemeditor reply=", reply)
-                        if (reply.key == 'OK') {
-                            this.item.title = reply.item.title;
-                            this.item.data = reply.item.data;
-                        }
-                    });
+        EditScene(item) {
+            if (!item) item=this.item
 
-                default:
-                    break;
-            }
+            return new Promise((resolve,reject)=>{
+                //console.log("EDIT SCENE ", item.type);
+                switch (item.type) {
+                    case "scene":
+                    case "action":
+                        //console.log("layout ", this.layout,this.$refs["itemEditor"])
+                        this.$refs["itemEditor"].Edit(item, this.layout).then(reply => {
 
+                            console.log("itemeditor reply=", reply)
+                            if (reply.key == 'OK') {
+                                item.title = reply.item.title;
+                                item.data = reply.item.data;
+                                resolve(item);
+                                return;
+                            }
+                            
+                        });
+                        return;
+
+                    default:
+                        break;
+                }
+
+                reject();
+            })
         },
 
-        AddAction(action) {
-            console.log("add action ", action);
+        AddAction() {
+            this.$refs["ui"].select("Add scene", "Select scene to add", this.layout.scenes).then(reply => {
+                if (reply.action!='select') return;
 
+                var toAdd = { "type": "action", "title": action.title, data: null, "action": action.action, layoutkey: action.key };
+                console.log("Add and edit ", toAdd)
+                
+                if (!this.item.scenes) this.item.scenes = []
 
-            var toAdd = { "type": "action", "title": action.title, data: null, "action": action.action, layoutkey: action.key };
-            console.log("Add ", toAdd)
+                var playlist = this.playlist;
+                if (!playlist) playlist = this.item;
 
-            if (!this.item.scenes) this.item.scenes = []
+                this.EditScene(toAdd).then(editReply=>
+                {
+                    console.log("edit reply",editReply)
 
-            var playlist = this.playlist;
-            if (!playlist) playlist = this.item;
+                    toAdd.id = ++playlist.maxid;
+                    this.item.scenes.push(toAdd)                    
+                    this.collapsed = false
 
-            toAdd.id = ++playlist.maxid;
-            this.item.scenes.push(toAdd)
-            this.collapsed = false
-
-
+                })
+            })
         },
+
         select() {
 
         },
@@ -164,6 +180,11 @@ export default {
             this.$emit("command", cmd)
         },
         command(action) {
+            if (this.item.data==null)
+            {
+                this.EditScene();
+                return;
+            }
             this.$emit("command", { action: action, item: this.item })
             /* if (action == 'off') {
                  this.$emit("command", {

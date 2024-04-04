@@ -1,9 +1,9 @@
-<template>
+<template>  
   <v-expansion-panels multiple class="mb-2" v-model="panels">
     <v-expansion-panel value="main">
       <v-expansion-panel-title class="pt-0 pb-0">
         <div style="display: flex;xbackground-color: yellow;width: 100%; align-items: center;">
-          <h3>{{definition.field}}</h3>
+          <h3>{{definition.name || definition.field}}</h3>
           <div style="flex:1"></div>
           <VBtn v-if="value" size="small" variant="text" icon="mdi-delete" color="red" @click.stop="RemoveElement()">
           </VBtn>
@@ -89,6 +89,7 @@ export default {
 
         this.panels=[]
       },
+      
 
       Create()
       {
@@ -99,7 +100,17 @@ export default {
 
       AddElement()
       {
-        this.obj[this.definition.field].push({});
+        //this.obj[this.definition.field]=[];
+        var obj={};
+
+        if (this.definition.childs)
+        {
+          this.definition.childs.forEach(child=>{
+            obj[child.field]=child.default;
+          })
+        }
+
+        this.obj[this.definition.field].push(obj);
         this.panels=["main"]
       }
   },
