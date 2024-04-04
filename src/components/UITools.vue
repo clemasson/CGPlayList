@@ -138,6 +138,7 @@
                 <p v-if="message">
                   {{ message }}
                 </p>
+
                 <VTextField
                   v-model="text"
                   :label="fieldName"
@@ -148,7 +149,65 @@
               </VCardText>
             </slot> 
           </VForm>
-                
+
+          <VCardActions v-if="actions">
+            <VSpacer />
+  
+            <VBtn
+              v-for="action in actions"
+              :key="action.key"
+              text            
+              @click="dlgClick(action)"
+            >            
+              {{ action.key }}
+            </VBtn>                
+          </VCardActions>
+        </VCard>
+      </VDialog>   
+
+      <VDialog
+        v-if="dialog=='EditTextArea'"  
+        v-model="showDialog"
+        name="dlgTextDialog"
+        persistent
+        max-width="400"
+      >
+        <VCard>
+          <VCardTitle class="headline">
+            <span>{{ title }}</span>
+          </VCardTitle>
+  
+          <VCardText v-if="errorMessage">
+            <VAlert
+              :xicon="false"
+              :text="errorMessage"
+              type="error"
+            />
+          </VCardText>
+  
+          <VForm
+            ref="form"
+            v-model="valid"
+            lazy-validation
+            @submit.prevent="checkForm"
+          >
+            <slot name="form">
+              <VCardText>
+                <p v-if="message">
+                  {{ message }}
+                </p>
+
+                <VTextarea
+                  v-model="text"
+                  :label="fieldName"
+                  :rules="requiredRules"
+                  rows="25"
+                  filled
+                  required />
+
+                </VCardText>
+            </slot> 
+          </VForm>                
           
           <VCardActions v-if="actions">
             <VSpacer />
@@ -187,7 +246,7 @@
         promiseResolve:null,
         promiseReject:null,      
         fieldName:null,
-        text:null,
+        text:null,        
         requiredRules: [
           v => !!v || "REQUIRED",
         ],
@@ -299,6 +358,44 @@
         } },{ key: 'CANCEL' }]
       
         return this.show('EditText',title,message,actions)
+      },
+     
+      editTextArea(title,message,fieldName,value,validate)
+      {      
+        //var actions=[{ key:'OK',action: validate },{ key: 'CANCEL' }]
+  
+        this.text=value
+        this.fieldName=fieldName
+  
+        var actions=[{ key:'OK',action: ()=>{
+          //validate
+          return new Promise((resolve,reject)=>{
+  
+            console.log('Checkform')
+  
+            this.$refs.form.validate().then(valid=>{
+              if (this.valid)
+              {
+                if (validate)
+                {
+                  Promise.resolve(validate(this.text)).then(ok=>{
+                    console.log("we will accept")
+                    resolve(ok)
+                  }
+                  ,error=>reject(error))
+                } else resolve(this.text)
+                
+              } else {
+                reject()
+              }
+            },error=>{
+              reject(error)
+            })
+  
+          })
+        } },{ key: 'CANCEL' }]
+      
+        return this.show('EditTextArea',title,message,actions)
       },
      
       dlgClickKey:function(key)

@@ -43,6 +43,13 @@
                             <v-list-item value="scenedelete">
                                 <v-list-item-title @click="Delete()">Delete</v-list-item-title>
                             </v-list-item>
+                            <VDivider></VDivider>
+                            <v-list-item value="export">
+                                <v-list-item-title @click="GetRoot().Export(item)">Export</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item value="import">
+                                <v-list-item-title @click="GetRoot().Import(item)">Import</v-list-item-title>
+                            </v-list-item>
 
                         </v-list>
                     </v-menu>
@@ -97,7 +104,6 @@ export default {
             this.GetRoot().DeletePlaylistItem(this.item);
         },
 
-
         getType(element) {
             switch (element.type) {
                 case "folder":
@@ -109,7 +115,9 @@ export default {
         },
 
         Edit() {
-            this.$refs["ui"].editText("Rename folder", "Folder name", "Name", this.item.title).then(reply => {
+            var toEdit={ data: this.item.data,scenes:this.item.scenes }
+
+            this.$refs["ui"].editText("Rename folder", "Folder name", "Name", toEdit).then(reply => {
                 console.log("add folder reply", reply)
 
                 if (reply.key == 'OK') {

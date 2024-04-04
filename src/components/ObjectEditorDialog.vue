@@ -89,7 +89,7 @@ import ObjectEditor  from "./ObjectEditor.vue"
 
         Promise.resolve(reply).then(success=>
         {
-          this.promiseResolve( { key: action.key,data: this.obj,definition:this.definition } )
+          this.promiseResolve( { key: action.key,data: JSON.parse(JSON.stringify(this.obj)),definition:this.definition } )
 
           this.showDialog=false
         },error=>{

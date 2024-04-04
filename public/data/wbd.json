@@ -19,7 +19,9 @@
             "teampresentation,default,,C2.58 Team presentation",
             "schedule,default,,C2.59 - schedule",
             "background,bg,,C2.60 - Still",
-            "backgroundvideo,bg,,C2.61 - Video"
+            "backgroundvideo,bg,,C2.61 - Video",
+            "miniresults:lastwinners,default,,Last Winners",
+            "worldcupwins,default,,World Cup Wins"
         ],
     "definitions":
     {
@@ -64,7 +66,11 @@
         "fichetriorideritem":["title","text|textarea"],
         "teampresentation":["*mode","title|text|TEAM","subtitle","*logo","riders|array,teampresentationrider,lastname"],
         "teampresentationrider":["role","firstname","lastname","datatitle|text|AGE","datavalue,,Age","nat","picture"],
-        "countdown":["*mode","title","start,,UTC time - eg: 2024-04-15 15:00:00|text","*alignright"]
+        "countdown":["*mode","title","start,,UTC time - eg: 2024-04-15 15:00:00|text","*alignright"],
+        "lastwinners":["*mode","title","subtitle","items|array,lastwinneritem"],
+        "lastwinneritem":["firstname","lastname","nat","result,year"],
+        "worldcupwins":["*mode","title","subtitle","freeze|text|1","pageSize|text|5","items|array,worldcupwinitem"],
+        "worldcupwinitem":["firstname","lastname","nat","team","wins"]
 
     }
 }

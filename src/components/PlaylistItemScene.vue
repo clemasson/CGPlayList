@@ -43,6 +43,14 @@
                             <v-list-item value="scenedelete">
                                 <v-list-item-title @click.stop="Delete()">Delete</v-list-item-title>
                             </v-list-item>
+                            <VDivider></VDivider>
+                            <v-list-item value="export">
+                                <v-list-item-title @click="GetRoot().Export(item)">Export</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item value="import">
+                                <v-list-item-title @click="GetRoot().Import(item)">Import</v-list-item-title>
+                            </v-list-item>
+
                         </v-list>
                     </v-menu>
                 </div>
@@ -147,6 +155,8 @@ export default {
                 reject();
             })
         },
+
+
 
         AddAction() {
             this.$refs["ui"].select("Add scene", "Select scene to add", this.layout.scenes).then(reply => {

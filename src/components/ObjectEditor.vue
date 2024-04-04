@@ -1,5 +1,6 @@
 <template>
-  <VExpansionPanels v-model="panels" multiple class="mb-2 " v-if="definition">
+
+<VExpansionPanels v-model="panels" multiple class="mb-2 " v-if="definition">
     <VExpansionPanel value="main" >
       <VExpansionPanelTitle class="pt-0 pb-0">
         <h3>{{ definition.name || definition.field }}</h3>

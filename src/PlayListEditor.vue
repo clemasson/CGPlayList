@@ -122,6 +122,9 @@
 
 
 
+
+
+
         <!-- <ScoreboardScene @command="processCommand" :definition="scene" :data="{}" v-for="(scene, i) in scenes.scenes"
           :key="i">
         </ScoreboardScene>

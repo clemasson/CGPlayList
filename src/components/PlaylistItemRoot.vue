@@ -23,15 +23,19 @@
                     </template>
 
                     <v-list density="compact">
-                        <v-list-item v-if="item.type == 'root' || item.type == 'folder'" value="folder">
+                        <v-list-item value="folder">
                             <v-list-item-title @click="AddFolder()">Folder</v-list-item-title>
                         </v-list-item>
-                        <v-list-item v-if="item.type == 'root' || item.type == 'folder'" value="scene">
+                        <v-list-item value="scene">
                             <v-list-item-title @click="AddScene()">Scene</v-list-item-title>
                         </v-list-item>
-                        <v-list-item v-if="item.type == 'scene'" value="scene">
-                            <v-list-item-title @click="AddScene()">Action</v-list-item-title>
-                        </v-list-item>
+                        <VDivider></VDivider>
+                            <v-list-item value="export">
+                                <v-list-item-title @click="GetRoot().Export(item)">Export</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item value="import">
+                                <v-list-item-title @click="GetRoot().Import(item)">Import</v-list-item-title>
+                            </v-list-item>
                     </v-list>
                 </v-menu>
             </div>
@@ -77,7 +81,45 @@ export default {
         GetRoot()
         {
             return this;
-        },        
+        },
+
+        Download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        },
+
+
+        Export(item)
+        {
+            if (item==null) item=this.item
+            var toExport={ data: item.data,scenes:item.scenes }
+
+            this.Download('playlist.json',JSON.stringify(toExport,null,4));
+        },
+
+        Import(item)
+        {
+            if (item==null) item=this.item
+
+            var toEdit={ data: item.data,scenes:item.scenes }
+
+            this.$refs["ui"].editTextArea("Raw content","Copy/Paste content of an exported file","Content",JSON.stringify(toEdit,null,4)).then(reply=>{
+                if (reply.key!='OK') return;
+
+                var parsed=JSON.parse(reply.data);
+                item.scenes=parsed.scenes;
+                item.data=parsed.data;
+
+            })
+        },
 
         DeletePlaylistItem(item)
         {
@@ -142,7 +184,6 @@ export default {
         },
         EditScene(item) {
             if (!item) item=this.item
-
 
             return new Promise((resolve,reject)=>{
                 //console.log("EDIT SCENE ", item.type);
