@@ -5,20 +5,23 @@
     "scenes":
         [
             "watermark,wat,,C2.1 - Watermark",
+            "safe,safe,,Safe zone",
             "background,bg,,C2.60 - Still",
             "backgroundvideo,bg,,C2.61 - Video",
-            "name,,,C2.1 lower third 1 line|showspeed|hidespeed",
-            "name,,,C2.2 lower2 lines|showspeed|hidespeed",
+            "localisation:name,,namemode,C2.1 lower third 1/2 lines",
             "dualname,default,,2 Names"
         ],
     "definitions":
     {
-        "watermark": ["logo,Logo|dropdown,xco,xcc,dhi|Watermark picture"],
-        "background": ["image,Image,Background image|text"],
+        "watermark": ["discipline,discipline|dropdown,xco,xcc,dhi|Watermark picture"],
+        "background": ["image,Image,Background image|dropdown,bg1,dve_3070,dve_5050,dve_7030"],
         "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"],
-        "name": ["name|text", "team|text", "nat|text"],
+        "namemode": ["*mode","*name"],
+        "align":["align|dropdown,left,right,dve3070-left,dve3070-right,dve5050-left,dve5050-right,dve7030-left,dve7030-right"],
+        "name": ["*align","name|text", "team|text", "nat|text","bib","pos","*arrow"],
         "name.showspeed": ["speed|text"],
         "dualname": ["*mode", "name1,,Left rider|*name", "name2,,Right rider|*name"],
-        "mode": ["mode|dropdown,red,green"]
+        "mode": ["mode|dropdown,red,green"],
+        "arrow": ["enarrow|boolean","picture"]
     }
 }

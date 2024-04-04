@@ -59,9 +59,12 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item,key) in preview.state" :key="key">
+                  <tr v-for="(item,key) in preview.state" :key="key" >
                     <td>{{ key }}</td>
                     <td>{{ item.template }}</td>
+                    <td>
+                      <VBtn size="x-small" color="warning" @click="SendCommand(preview,'play',key,null,'off',null,true);" icon="mdi-minus"></VBtn>
+                    </td>
                   </tr>
                 </tbody>
               </VTable>
@@ -91,6 +94,23 @@
               <a class="app-link text-primary" :href="GetTemplateUrl(main)" target="_blank">{{ GetTemplateUrl(main)
                 }}</a>
 
+              <VTable density="compact" hover>
+                <thead>
+                  <tr>
+                    <td>Layer</td>
+                    <td>Scene</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item,key) in main.state" :key="key" >
+                    <td>{{ key }}</td>
+                    <td>{{ item.template }}</td>
+                    <td>
+                      <VBtn size="x-small" color="warning" @click="SendCommand(main,'play',key,null,'off',null,true);" icon="mdi-minus"></VBtn>
+                    </td>
+                  </tr>
+                </tbody>
+              </VTable>
 
 
             </div>
@@ -370,6 +390,26 @@ export default {
       } else this.dirty = false;
     },
 
+    takeIn(layer)
+    {
+      var data=this.preview.state[layer];
+        if (data)
+        {
+          this.SendCommand(this.main,"play",layer,data.template,data.action,data.data);
+        }
+        //{ "template":  page,"action": action,"data":data }
+    },
+
+    takeOut(layer)
+    {
+      var data=this.main.state[layer];
+      if (data)
+      {
+        this.SendCommand(this.main,"play",layer,null,"off",null,true);        
+      }
+      //{ "template":  page,"action": action,"data":data }
+    },
+
     resizeViewers() {
 
       var viewers = this.$el.querySelectorAll(".viewer")
@@ -423,17 +463,23 @@ export default {
       return false;
     });*/
 
-    document.addEventListener("keydown", function(e)
+    document.addEventListener("keydown", e =>
     {
       if (e.key=='F1')
       {
-        console.log("keydown: ",e.key,e)
+        console.log("keydown: ",e.key,e,this.preview)
+
+        this.takeIn("default");
+
         e.preventDefault();
         return false;
       }
       if (e.key=='F2')
       {
         console.log("keydown: ",e.key,e)
+
+        this.takeOut("default");
+
         e.preventDefault();
         return false;
       }

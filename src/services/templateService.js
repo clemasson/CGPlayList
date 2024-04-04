@@ -1,6 +1,28 @@
 import axios from 'axios'
 import appSettingsService from './appSettingsService'
 
+/***!SECTION
+ * 
+Field:
+-----------
+field,name,help|type,args|validators
+	- type: text|array|object|dropdown|boolean
+
+if field starts with *, will copy reference to an other defintiion
+
+Scene:
+-----------
+template[:key],[layer],[definition],[title]|actions
+
+Action:
+-----------
+action[:key],[definition],[title]  // default definition: template.action
+
+
+ * 
+ * 
+ */
+
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -223,7 +245,7 @@ const templateService = new (class {
 
                 //console.log("field name",field,name,description)                
 
-                var typeTokens = (tokens.length > 0 ? tokens[1] : 'text').split(',');
+                var typeTokens = (tokens.length > 1 ? tokens[1] : 'text').split(',');
                 var type = typeTokens[0];
                 typeTokens.splice(0, 1)
                 if (type.startsWith("*")) {
@@ -325,10 +347,13 @@ const templateService = new (class {
             var templateNameTokens = sceneTokens[0].split(':');
             var templateName = templateNameTokens[0];
             var key = templateNameTokens.length > 1 ? templateNameTokens[1] : templateName;
+
+            console.log("Template: ",templateName,key)
+
             var layer = sceneTokens.length > 1 ? sceneTokens[1] : 'default';
             if (layer == '') layer = 'default';
             var definition = sceneTokens.length > 2 ? sceneTokens[2] : key;
-            if (definition == "") definition = templateName;
+            if (definition == "") definition = key;
             var title = sceneTokens.length > 3 ? sceneTokens[3] : null;
             toRet = { "key": key, "template": templateName, "layer": layer, "definition": definition, "title": title }
 
