@@ -6,19 +6,22 @@
         [
             "watermark,wat,,C2.1 - Watermark",
             "safe,safe,,Safe zone",
-            "copyright,default,,Copyright",
-            "background,bg,,C2.60 - Still",
-            "backgroundvideo,bg,,C2.61 - Video",
+            "countdown,default,,C2.11 - Countdown",
+            "copyright,default,,C2.16 - Copyright",
             "localisation:name,,namemode,Lower third - all varations",
             "dualname,default,,2 Names",
-            "localisation:nextevent,,,Next Event",
-            "localisation:weather,,,Weather",
+            "localisation:nextevent,,,C2.19 - Next Event",
+            "localisation:weather,,,C2.13 - Weather",
             "textinfoboard,default,,C2.56 - edito facts",
             "ficheduo,default,,C2.57 - head 2 head",
             "fichetrio,default,,C2.57 - trio",
             "fiche,default,,C2.58 - fiche",
             "teampresentation,default,,C2.58 Team presentation",
-            "schedule,default,,C2.59 - schedule"
+            "schedule,default,,C2.59 - schedule",
+            "background,bg,,C2.60 - Still",
+            "backgroundvideo,bg,,C2.61 - Video",
+            "miniresults:lastwinners,default,,Last Winners",
+            "worldcupwins,default,,World Cup Wins"
         ],
     "definitions":
     {
@@ -59,10 +62,15 @@
         "ficheduoitem":["type|dropdown,data,longtitle,separator|data","title","text1","text2"],
 
         "fichetrio":["*logo","*mode","title","rider1|object,fichetriorider","rider2|object,fichetriorider","rider3|object,fichetriorider"],
-        "fichetriorider":["firstname","lastname","nat","picture","items|array,fichetriorideritem,title"],
+        "fichetriorider":["firstname","lastname","nat","team","picture","items|array,fichetriorideritem,title"],
         "fichetriorideritem":["title","text|textarea"],
         "teampresentation":["*mode","title|text|TEAM","subtitle","*logo","riders|array,teampresentationrider,lastname"],
-        "teampresentationrider":["role","firstname","lastname","datatitle|text|AGE","datavalue,,Age","nat","picture"]
+        "teampresentationrider":["role","firstname","lastname","datatitle|text|AGE","datavalue,,Age","nat","picture"],
+        "countdown":["*mode","title","start,,UTC time - eg: 2024-04-15 15:00:00|text","*alignright"],
+        "lastwinners":["*mode","title","subtitle","items|array,lastwinneritem"],
+        "lastwinneritem":["firstname","lastname","nat","result,year"],
+        "worldcupwins":["*mode","title","subtitle","freeze|text|1","pageSize|text|5","items|array,worldcupwinitem"],
+        "worldcupwinitem":["firstname","lastname","nat","team","wins"]
 
     }
 }
