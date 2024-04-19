@@ -91,6 +91,7 @@ export default {
             messages: [],
             localData: {},
             collapsed: true,
+            
         };
     },
     props: ["item", "data", "layout", "playlist"],
@@ -158,28 +159,26 @@ export default {
 
 
 
-        AddAction() {
-            this.$refs["ui"].select("Add scene", "Select scene to add", this.layout.scenes).then(reply => {
-                if (reply.action!='select') return;
+        AddAction(action) {
 
-                var toAdd = { "type": "action", "title": action.title, data: null, "action": action.action, layoutkey: action.key };
-                console.log("Add and edit ", toAdd)
-                
-                if (!this.item.scenes) this.item.scenes = []
+            var toAdd = { "type": "action", "title": action.title, data: null, "action": action.action, layoutkey: action.key };
+            console.log("Add and edit ", toAdd)
+            
+            if (!this.item.scenes) this.item.scenes = []
 
-                var playlist = this.playlist;
-                if (!playlist) playlist = this.item;
+            var playlist = this.playlist;
+            if (!playlist) playlist = this.item;
 
-                this.EditScene(toAdd).then(editReply=>
-                {
-                    console.log("edit reply",editReply)
+            this.EditScene(toAdd).then(editReply=>
+            {
+                console.log("edit reply",editReply)
 
-                    toAdd.id = ++playlist.maxid;
-                    this.item.scenes.push(toAdd)                    
-                    this.collapsed = false
+                toAdd.id = ++playlist.maxid;
+                this.item.scenes.push(toAdd)                    
+                this.collapsed = false
 
-                })
             })
+            
         },
 
         select() {

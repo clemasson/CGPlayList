@@ -25,6 +25,7 @@
         ],
     "definitions":
     {
+        "bg":["enbackground|boolean,1,0|1","*background"],        
         "watermark": ["discipline,discipline|dropdown,xco,xcc,dhi|Watermark picture"],
         "background": ["image,Image,Background image|dropdown,bg1,dve_3070,dve_5050,dve_7030"],
         "backgroundvideo": ["video,Video file name,Video file name (empty use default video)|text"],
@@ -56,15 +57,15 @@
         "schedulesectionitem":["time","zone","text"],
         "logo":["logo|dropdown,xco,xcc,dhi"],
         "ficherider":["firstname","lastname","nat","picture"],
-        "fiche":["*logo","*mode","title","rider|object,ficherider","items|array,ficheitem,title"],
+        "fiche":["*bg","*logo","*mode","title","rider|object,ficherider","items|array,ficheitem,title"],
         "ficheitem":["type|dropdown,data,separator|data","title","text"],
-        "ficheduo":["*logo","*mode","title","rider1|object,ficherider","rider2|object,ficherider","items|array,ficheduoitem,title"],
+        "ficheduo":["*bg","*logo","*mode","title","rider1|object,ficherider","rider2|object,ficherider","items|array,ficheduoitem,title"],
         "ficheduoitem":["type|dropdown,data,longtitle,separator|data","title","text1","text2"],
 
-        "fichetrio":["*logo","*mode","title","rider1|object,fichetriorider","rider2|object,fichetriorider","rider3|object,fichetriorider"],
+        "fichetrio":["*bg","*logo","*mode","title","rider1|object,fichetriorider","rider2|object,fichetriorider","rider3|object,fichetriorider"],
         "fichetriorider":["firstname","lastname","nat","team","picture","items|array,fichetriorideritem,title"],
         "fichetriorideritem":["title","text|textarea"],
-        "teampresentation":["*mode","title|text|TEAM","subtitle","*logo","riders|array,teampresentationrider,lastname"],
+        "teampresentation":["*bg","*mode","title|text|TEAM","subtitle","*logo","riders|array,teampresentationrider,lastname"],
         "teampresentationrider":["role","firstname","lastname","datatitle|text|AGE","datavalue,,Age","nat","picture"],
         "countdown":["*mode","title","start,,UTC time - eg: 2024-04-15 15:00:00|text","*alignright"],
         "lastwinners":["*mode","title","subtitle","items|array,lastwinneritem"],

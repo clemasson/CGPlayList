@@ -115,9 +115,8 @@ export default {
         },
 
         Edit() {
-            var toEdit={ data: this.item.data,scenes:this.item.scenes }
 
-            this.$refs["ui"].editText("Rename folder", "Folder name", "Name", toEdit).then(reply => {
+            this.$refs["ui"].editText("Rename folder", "Folder name", "Name", this.item.title).then(reply => {
                 console.log("add folder reply", reply)
 
                 if (reply.key == 'OK') {

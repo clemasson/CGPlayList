@@ -6,13 +6,15 @@
         [
             "backgroundvideo,bg,,C2.61 - Video",
             "startlight,default,,Lights|update|toggle|setred|setgreen|setblack",
-            "scoreboardtodtop,tod,,Time of day - top"
+            "scoreboardtodtop,default,,Time of day - top",
+            "scoreboardcountdown,default,,Countdown - top"
 
         ],
     "definitions":
     {
         "startlight":["state|dropdown,-,red,green,black"],
         "scoreboardtodtop":["timezone|text"],
+        "scoreboardcountdown":["start,,UTC start date+time|text"],
         "startlight.update":["*startlight","toggle|boolean,0,1"],
         "backgroundvideo": ["video,ImageFileName,Video file name (empty use default video)|text"]
     }

@@ -16,8 +16,10 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 5000,
+    outDir:'/chronorace/git/chronorace-git/Applications/bin/web/chrono/playlist'
   },
   base:'/playlist/',
+
 
   server: {
     port: 5173,

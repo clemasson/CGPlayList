@@ -108,7 +108,7 @@ const templateService = new (class {
                 if (ts.startsWith('http')) {
                     toRet = ts
                 }
-                else toRet = "https://" + ts + '/webresources/cgtemplates/index.html#/';
+                else toRet = "http://" + ts + '/webresources/cgtemplates/index.html#/';
                 break;
         }
         return toRet;
@@ -124,7 +124,7 @@ const templateService = new (class {
         // - pusher:channel (
 
         var toRet = {
-            "mode": 'host',
+            "mode": 'direct',
             "name": name,
             "host": "localhost",
             "port": 9951,
@@ -139,9 +139,15 @@ const templateService = new (class {
         var channel = null;
         var host = null;
         var port = null;
+        var wsport=null;
 
         if (!toRet.mode || toRet.mode == '') toRet.mode = 'direct';
         if (toRet.mode == 'websocket') toRet.mode = 'ws';
+
+        
+        console.log("PARSE CHANNEL: ",tokens);
+
+
 
         switch (toRet.mode) {
             case "direct":
@@ -151,14 +157,23 @@ const templateService = new (class {
                 break;
 
             case "ws":
+                host = tokens.length > 1 ? tokens[1] : '';
+                if (!host || host == '') host = 'localhost';
+                port = tokens.length > 2 ? tokens[2] : '';
+                if ((!port || port == '') && toRet.mode == 'api') port = '9751';
+                if ((!port || port == '') && toRet.mode == 'ws') port = '9991';
+                break;
+
             case "api":
                 host = tokens.length > 1 ? tokens[1] : '';
                 if (!host || host == '') host = 'localhost';
                 port = tokens.length > 2 ? tokens[2] : '';
-                if ((!port || port == '') && mode == 'api') port = '9751';
-                if ((!port || port == '') && mode == 'ws') port = '9991';
-
+                wsport = tokens.length > 3 ? tokens[3] : '';
+                toRet.wsport = tokens.length > 2 ? tokens[2] : '';
+                if (!port || port == '') port = '9951';
+                if (!wsport || wsport == '') wsport = port;
                 break;
+
 
             default:
                 channel = toRet.mode;
@@ -166,22 +181,31 @@ const templateService = new (class {
                 break;
         }
 
+        toRet.channel = channel;
+        toRet.host = host;
+        toRet.port = port;
+        toRet.wsport = wsport;
+
         toRet.title = toRet.mode;
         switch (toRet.mode) {
             case "pusher":
-                toRet.title = "pusher / " + toRet.channel
+            case "ws":
+                toRet.title =  toRet.mode+ " / " + toRet.channel+(toRet.port?':'+toRet.port:'')
                 break;
 
+            case "api":
+                toRet.title =  toRet.mode+ " / " + toRet.host+(toRet.port?':'+toRet.port:'')+(toRet.wsport?':'+toRet.wsport:'')
+                break;
+
+
             default:
+                toRet.title='direct'
                 break;
         }
 
 
-        toRet.channel = channel;
-        toRet.host = host;
-        toRet.port = port;
 
-        console.log("parseChannel=", strChannel)
+        console.log("parseChannel=", strChannel,toRet)
 
         return toRet;
     }
@@ -192,7 +216,7 @@ const templateService = new (class {
 
         switch (channel.mode) {
             case "api":
-                toRet = toRet + 'ws?host=' + channel.host + ':' + channel.port + '&'
+                toRet = toRet + 'ws?host=' + channel.host + ':' + channel.wsport + '&'
                 break;
 
             case "ws":
@@ -590,6 +614,10 @@ const templateService = new (class {
         {
             case "pusher":
                 data.pusher=channel.channel;
+                break;
+
+            case "api":
+                data.url='http://'+channel.host+':'+channel.port+'/api/cg/'
                 break;
         }
 
