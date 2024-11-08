@@ -101,6 +101,10 @@ const templateService = new (class {
                 break;
 
             case "local":
+                toRet = "http://localhost:8080/#/";
+                break;
+    
+            case "localcb":
                 toRet = "http://localhost:8080/webresources/cgtemplates/index.html#/";
                 break;
 
@@ -108,7 +112,8 @@ const templateService = new (class {
                 if (ts.startsWith('http')) {
                     toRet = ts
                 }
-                else toRet = "http://" + ts + '/webresources/cgtemplates/index.html#/';
+                //else toRet = "http://" + ts + '/webresources/cgtemplates/index.html#/';
+                else toRet = "http://" + ts + '/index.html#/';
                 break;
         }
         return toRet;

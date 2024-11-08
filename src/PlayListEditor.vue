@@ -308,11 +308,12 @@ export default {
         {          
           case "direct":
             var frame=this.$refs[channel.channel]
-            console.log("frame = ",frame)
+            console.log("frame = ",frame,channel.channel)
             
             var toSend = { command: command, page: page, action: action, data: toRaw(data), layer: layer };
 
             frame.contentWindow.postMessage(toSend, '*');
+            //frame.postMessage(toSend, '*');
 
             break;
 
